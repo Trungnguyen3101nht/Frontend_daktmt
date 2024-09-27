@@ -6,6 +6,7 @@ import 'package:frontend_daktmt/pages/profile/profile.dart';
 import 'package:frontend_daktmt/pages/relay/relay.dart';
 import 'package:frontend_daktmt/pages/schedule/schedule.dart';
 import 'package:frontend_daktmt/pages/setting/setting.dart';
+import 'package:frontend_daktmt/nav_bar/nav_bar_right.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +31,7 @@ class _MyAppState extends State<MyApp> {
         '/relay': (context) => const RelayScreen(),
         '/schedule': (context) => const ScheduleScreen(),
         '/profile': (context) => const ProfileScreen(),
-        '/settings': (context) => const SettingsScreen(),
+        '/setting': (context) => const SettingsScreen(),
       },
     );
   }
@@ -46,10 +47,13 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       drawer: const Navbar_left(),
+      endDrawer: const Navbar_right(),
+      
       appBar: AppBar(
         title: const Text('Navigation drawer'),
-        backgroundColor: Colors.green,
+        backgroundColor: const Color.fromARGB(255, 1, 253, 10),
       ),
       body: const Center(
         child: Text(

@@ -10,20 +10,7 @@ class Navbar_left extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const UserAccountsDrawerHeader(
-            accountName: Text('Hello'),
-            accountEmail: Text('Hello@gmail.com'),
-            currentAccountPicture: CircleAvatar(
-              child: ClipOval(
-                  // child: Image.asset('images/profile.jpg'),
-                  ),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              // image: DecorationImage(image: AssetImage(''),fit: Boxfit.cover)
-            ),
-          ),
-          const Divider(),
+          
           ListTile(
               leading: const Icon(Icons.home),
               title: const Text('Home'),
@@ -60,6 +47,7 @@ class Navbar_left extends StatelessWidget {
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/setting');
               }),
+              const Divider(),
           ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Sign Out'),
