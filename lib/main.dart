@@ -30,7 +30,7 @@ class _MyAppState extends State<MyApp> {
         '/relay': (context) => const RelayScreen(),
         '/schedule': (context) => const ScheduleScreen(),
         '/profile': (context) => const ProfileScreen(),
-        '/settings': (context) => const SettingsScreen(),
+        '/setting': (context) => const SettingsScreen(),
       },
     );
   }
