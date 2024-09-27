@@ -45,6 +45,7 @@ class _MyAppState extends State<MyApp> {
       initialRoute: _isAuthenticated ? '/main' : '/',
       routes: {
         '/': (context) => const SignIn(),
+        '/signin': (context) => const SignIn(),
         '/register': (context) => const Register(),
         '/main': (context) =>
             const MainPage(), // Navigate to MainPage for authenticated users
