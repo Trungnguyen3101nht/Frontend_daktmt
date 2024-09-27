@@ -13,19 +13,30 @@ class _SignInState extends State<SignIn> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _passwordVisible = false;
+  String? _errorMessage;
 
-  void _handleOnClick(BuildContext context) {
+  Future<void> _handleOnClick(BuildContext context) async {
     if (_emailController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty &&
         _emailController.text.isValidEmail()) {
-      fetchSignIn(_emailController, _passwordController, context);
+      bool isSuccess =
+          await fetchSignIn(_emailController, _passwordController, context);
+      if (!isSuccess) {
+        setState(() {
+          _errorMessage = 'Đăng nhập không thành công. Vui lòng thử lại.';
+        });
+      } else {
+        setState(() {
+          _errorMessage = null;
+        });
+      }
     } else {
       print('Email và mật khẩu không được để trống.');
     }
   }
 
   void _handleSignUpClick(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/signup');
+    Navigator.pushReplacementNamed(context, '/register');
   }
 
   void _handleForgotPasswordClick(BuildContext context) {
@@ -89,6 +100,18 @@ class _SignInState extends State<SignIn> {
                       setState(() {});
                     },
                   ),
+                  // Error message display
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        _errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   TextField(
                     keyboardType: TextInputType.text,
                     controller: _passwordController,
@@ -132,8 +155,7 @@ class _SignInState extends State<SignIn> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => _handleForgotPasswordClick(
-                            context), // Call forgot password function
+                        onTap: () => _handleForgotPasswordClick(context),
                         child: const Text(
                           'Forgot Password?',
                           style: TextStyle(
