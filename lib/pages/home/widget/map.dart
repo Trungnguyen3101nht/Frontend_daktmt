@@ -1,28 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_daktmt/pages/home/home.dart';
 
-class Mapdesk extends StatelessWidget {
-  const Mapdesk({
-    super.key,
-  });
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return const BorderedContainer(
-      child: SizedBox(
-        height: 220.0,
-        width: double.infinity,
-        child: Center(child: Text('Map')),
-      ),
-    );
-  }
-}
-
-
-
+// =======================
 // ignore: camel_case_types
-class mapmobile extends StatelessWidget {
-  const mapmobile({
+class map extends StatelessWidget {
+  const map({
     super.key,
     required this.gaugeHeight,
     required this.gaugeWidth,
@@ -37,9 +22,35 @@ class mapmobile extends StatelessWidget {
       child: SizedBox(
         height: gaugeHeight,
         width: gaugeWidth,
-        child: const Center(child: Text('Map')),
+        child: FlutterMap(
+          options: const MapOptions(
+            initialCenter: LatLng(10.879569567979344, 106.80568875364565), 
+            initialZoom: 15,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate:
+                  'https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=pqZwfqHFA5XexcvOOXeb',
+              subdomains: const ['a', 'b', 'c'],
+            ),
+            const MarkerLayer(
+              markers: [
+                Marker(
+                  point: LatLng(10.880336572604842, 106.80479553251045), // Vị trí của marker
+                  // Chỉ cần đảm bảo rằng bạn đã chỉ định kích thước cho Marker
+                  width: 40, // Chiều rộng
+                  height: 40, // Chiều cao
+                  child: Icon(
+                    Icons.location_on,
+                    size: 40.0,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
 }
-

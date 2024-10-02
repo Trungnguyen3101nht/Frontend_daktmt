@@ -9,22 +9,22 @@ class Navbar_right extends StatelessWidget {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
-        children: const [
+        children:  [
           UserAccountsDrawerHeader(
-            accountName: Text('NguyenTrung'),
-            accountEmail: Text('trungvodich@gmail.com'),
+            accountName: const Text('NguyenTrung'),
+            accountEmail: const Text('trungvodich@gmail.com'),
             currentAccountPicture: CircleAvatar(
               child: ClipOval(
-                  // child: Image.asset('images/profile.jpg'),
+                  child: Image.asset('assets/hcmut.png'),
                   ),
             ),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
              color: Color.fromARGB(255, 165, 165, 165),
             //   image: DecorationImage(image: AssetImage('C:/Users/trung/Pictures/download image/pxfuel.jpg'))
             ),
           ),
-          Divider(),
-          ListTile(
+          const Divider(),
+          const ListTile(
               title: Text('Tests scheduled'),
          ),
       ],

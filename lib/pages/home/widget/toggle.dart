@@ -5,22 +5,36 @@ import 'package:flutter/material.dart';
 class toggle extends StatelessWidget {
   const toggle({
     super.key,
-  });
+      required this.toggleHeight,
+      required this.toggleWidth,
+      required this.numOfRelay,
+      
+    });
 
-  @override
+  final double toggleHeight;
+  final double toggleWidth;
+  final int numOfRelay;
+
+   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 4, // 4 cột cho trạng thái On/Off
-      crossAxisSpacing: 10.0,
-      mainAxisSpacing: 5.0,
-      children: const [
-        OnOffSwitch(label: 'Relay 1', state: true), // Hiển thị Relay 1 On
-        OnOffSwitch(label: 'Relay 2', state: false), // Hiển thị Relay 2 Off
-        OnOffSwitch(label: 'Relay 3', state: true), // Hiển thị Relay 3 On
-        OnOffSwitch(label: 'Relay 4', state: false), // Hiển thị Relay 4 Off
-      ],
+    return SizedBox(
+      width: toggleWidth,
+      height: toggleHeight,
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: numOfRelay, 
+        crossAxisSpacing: 10.0,
+        mainAxisSpacing: 5.0,
+        children: const [
+          OnOffSwitch(label: 'Relay 1', state: true), 
+          OnOffSwitch(label: 'Relay 2', state: false), 
+          OnOffSwitch(label: 'Relay 3', state: true), 
+          OnOffSwitch(label: 'Relay 4', state: false),
+          OnOffSwitch(label: 'Relay 5', state: true),
+          OnOffSwitch(label: 'Relay 6', state: false), 
+        ],
+      ),
     );
   }
 }
@@ -35,9 +49,12 @@ class OnOffSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(.0),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey), // Đường viền khung
+        border: Border.all(
+          color: const Color.fromARGB(255, 253, 253, 254).withOpacity(0.3),
+          width: 2.0,
+        ), 
+        color: const Color.fromARGB(255, 252, 251, 251).withOpacity(0.6),
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Column(
@@ -50,11 +67,11 @@ class OnOffSwitch extends StatelessWidget {
               fontSize: 16.0,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 2),
           Text(
             state ? 'On' : 'Off', // Hiển thị trạng thái On/Off
-            style: TextStyle(
-              color: state ? Colors.green : Colors.red, // Màu cho On/Off
+            style:TextStyle(
+              color: state ? const Color.fromARGB(255, 0, 94, 245) : const Color.fromARGB(255, 254, 2, 2) , // Màu cho On/Off
               fontWeight: FontWeight.bold,
               fontSize: 18.0,
             ),

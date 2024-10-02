@@ -10,32 +10,59 @@ class GaugeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String unit = label == 'Humidity' ? '%' : '°C';
     return Column(
+      
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(label),
+  
         SizedBox(
-          height: 150,
+          height: 170,
           child: SfRadialGauge(
             axes: <RadialAxis>[
               RadialAxis(
                 minimum: 0,
                 maximum: 100,
                 ranges: <GaugeRange>[
-                  GaugeRange(startValue: 0, endValue: 20, color: Colors.green),
+                  GaugeRange(startValue: 0, endValue: 20, color: const Color.fromARGB(255, 1, 254, 10)),
                   GaugeRange(startValue: 20, endValue: 40, color: const Color.fromARGB(255, 179, 255, 0)),
-                  GaugeRange(startValue: 40, endValue: 60, color: const Color.fromARGB(255, 217, 255, 0)),
+                  GaugeRange(startValue: 40, endValue: 60, color: const Color.fromARGB(255, 255, 242, 0)),
                   GaugeRange(startValue: 60, endValue: 80, color: const Color.fromARGB(255, 255, 187, 0)),
                   GaugeRange(startValue: 80, endValue: 100, color: const Color.fromARGB(255, 255, 94, 0)),
                 ],
                 pointers: <GaugePointer>[
-                  NeedlePointer(value: value),
+                  NeedlePointer(
+                    value: value,
+                    needleLength: 0.6, // Chiều dài của mũi tên (0.7 có nghĩa là 70% chiều dài tối đa)
+                    needleStartWidth: 1, // Chiều rộng phần đầu mũi tên
+                    needleEndWidth: 2, // Chiều rộng phần cuối mũi tên
+                    needleColor: Colors.red, 
+                  ),
                 ],
+                annotations: <GaugeAnnotation>[
+                  GaugeAnnotation(
+                    widget: Text(
+                      '${value.toStringAsFixed(1)} $unit', // Hiển thị giá trị với 1 chữ số thập phân
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    angle: 90,
+                    positionFactor: 0.7,
+                  ),
+                ],
+
               ),
             ],
           ),
         ),
-      ],
+
+        Text(
+          label,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        ),],
+      
     );
   }
 }
@@ -44,8 +71,8 @@ class GaugeWidget extends StatelessWidget {
 
 
 // ignore: camel_case_types
-class humigaugemobile extends StatelessWidget {
-  const humigaugemobile({
+class humigauge extends StatelessWidget {
+  const humigauge({
     super.key,
     required this.gaugeHeight,
     required this.gaugeWidth,
@@ -67,8 +94,8 @@ class humigaugemobile extends StatelessWidget {
 }
 
 // ignore: camel_case_types
-class tempgaugemobile extends StatelessWidget {
-  const tempgaugemobile({
+class tempgauge extends StatelessWidget {
+  const tempgauge({
     super.key,
     required this.gaugeHeight,
     required this.gaugeWidth,
@@ -88,41 +115,3 @@ class tempgaugemobile extends StatelessWidget {
     );
   }
 }
-
-// ignore: camel_case_types
-class humigaugedesk extends StatelessWidget {
-  const humigaugedesk({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return const BorderedContainer(
-      child: SizedBox(
-        height: 180.0,
-        width: double.infinity,
-        child: GaugeWidget(label: 'Humidity', value: 60.0),
-      ),
-    );
-  }
-}
-
-// ignore: camel_case_types
-class tempgaugedesk extends StatelessWidget {
-  const tempgaugedesk({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return const BorderedContainer(
-      child: SizedBox(
-        height: 180.0,
-        width: double.infinity,
-        child: GaugeWidget(label: 'Temperature', value: 25.0),
-      ),
-    );
-  }
-}
-
-

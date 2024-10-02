@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.frontend_daktmt"
+    namespace ="com.example.frontend_daktmt"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
