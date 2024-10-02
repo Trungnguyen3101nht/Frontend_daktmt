@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_daktmt/nav_bar/nav_bar_left.dart';
 import 'package:frontend_daktmt/pages/history/history.dart';
 import 'package:frontend_daktmt/pages/home/home.dart';
+import 'package:frontend_daktmt/pages/login/forget_pass.dart';
 import 'package:frontend_daktmt/pages/login/register.dart';
 import 'package:frontend_daktmt/pages/login/sign_in.dart';
 import 'package:frontend_daktmt/pages/profile/profile.dart';
@@ -47,6 +48,7 @@ class _MyAppState extends State<MyApp> {
         '/': (context) => const SignIn(),
         '/signin': (context) => const SignIn(),
         '/register': (context) => const Register(),
+        '/forget-password': (context) => const Forget(),
         '/main': (context) =>
             const MainPage(), // Navigate to MainPage for authenticated users
         '/home': (context) => const HomeScreen(),

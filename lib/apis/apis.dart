@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> fetchSignIn(TextEditingController emailController,
     TextEditingController passwordController, BuildContext context) async {
@@ -62,7 +62,10 @@ Future<bool> fetchRegister(
       }),
     );
     if (response.statusCode == 200) {
-      Navigator.pushReplacementNamed(context, '/login');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đăng kí tài khoản thành công')),
+      );
+      Navigator.pushReplacementNamed(context, '/signin');
       return true;
     } else {
       final errorMessage =
@@ -80,10 +83,46 @@ Future<bool> fetchRegister(
   }
 }
 
+Future<bool> fetchForgetPassword(TextEditingController emailController,
+    TextEditingController passwordController, BuildContext context) async {
+  final url = Uri.parse('http://localhost:8080/forgot-password');
+  try {
+    String convertEmail = emailController.text.toLowerCase();
+    final response = await http.patch(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'emailOrusername': convertEmail,
+        'newPassword': passwordController.text,
+      }),
+    );
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đổi mật khẩu thành công')),
+      );
+      Navigator.pushReplacementNamed(context, '/signin');
+      return true;
+    } else {
+      final errorMessage =
+          json.decode(response.body)['message'] ?? 'Tài khoản không tồn tại';
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(errorMessage)));
+      return false;
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Lỗi kết nối với server')));
+    return false;
+  }
+}
+
 Future<bool> fetchSendcode(String email) async {
   final url = Uri.parse('http://localhost:8080/email/send-code');
   try {
-    String convertEmail = email.toLowerCase(); // Chuyển email về chữ thường
+    String convertEmail = email.toLowerCase();
     final response = await http.post(
       url,
       headers: {

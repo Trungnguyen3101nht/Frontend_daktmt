@@ -40,7 +40,7 @@ class _SignInState extends State<SignIn> {
   }
 
   void _handleForgotPasswordClick(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/forgot_password');
+    Navigator.pushReplacementNamed(context, '/forget-password');
   }
 
   @override

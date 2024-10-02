@@ -30,7 +30,6 @@ class _RegisterState extends State<Register> {
   Timer? _timer;
   int _start = 60;
   bool _isTimerActive = false;
-  bool _isCodeSent = false;
 
   @override
   void dispose() {
@@ -61,7 +60,7 @@ class _RegisterState extends State<Register> {
       _code.text,
     );
 
-    if (!isSuccess) {
+    if (isSuccess) {
       isSuccess = await fetchRegister(_username, _emailController,
           _passwordController_1, _aiouser, _aiokey, _phone, context);
 
@@ -82,7 +81,24 @@ class _RegisterState extends State<Register> {
   }
 
   void _handleForgotPasswordClick(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/forgot_password');
+    Navigator.pushReplacementNamed(context, '/forget-password');
+  }
+
+  Future<void> _sendcode() async {
+    if (_emailController.toString().isEmpty) {
+      _errorMessage = "Vui lòng điền email";
+    }
+    bool isSuccess = await fetchSendcode(_emailController.text);
+    if (isSuccess) {
+      setState(() {
+        _isVerificationCodeVisible = true;
+        _errorMessage = null;
+      });
+    } else {
+      setState(() {
+        _errorMessage = 'Đã xảy ra lỗi khi gửi mã xác thực';
+      });
+    }
   }
 
   @override
@@ -133,22 +149,9 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                   if (!_isVerificationCodeVisible) ...[
-                    TextField(
-                      controller: _username,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          'Username',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xffB81736),
-                          ),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {}); // Update UI when text changes
-                      },
-                    ),
-                    // Email field
+                    // Username Field
+                    _buildTextField(controller: _username, label: 'Username'),
+                    // Email Field with validation icon
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -167,94 +170,25 @@ class _RegisterState extends State<Register> {
                         ),
                       ),
                       onChanged: (value) {
-                        setState(() {}); // Update UI when text changes
+                        setState(() {});
                       },
                     ),
-                    // Password field
-                    TextField(
+                    // Password Field
+                    _buildPasswordField(
                       controller: _passwordController_1,
-                      obscureText: !_passwordVisible,
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _passwordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _passwordVisible = !_passwordVisible;
-                            });
-                          },
-                        ),
-                        label: const Text(
-                          'Password',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xffB81736),
-                          ),
-                        ),
-                      ),
+                      label: 'Password',
                     ),
-                    // Confirm Password field
-                    TextField(
+                    // Confirm Password Field
+                    _buildPasswordField(
                       controller: _passwordController_2,
-                      obscureText: !_passwordVisible,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          'Confirm Password',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xffB81736),
-                          ),
-                        ),
-                      ),
+                      label: 'Confirm Password',
                     ),
-                    TextField(
-                      controller: _aiouser,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          'AIO Username',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xffB81736),
-                          ),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                    ),
-                    TextField(
-                      controller: _aiokey,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          'AIO Key',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xffB81736),
-                          ),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                    ),
-                    TextField(
-                      controller: _phone,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          'Phone number',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xffB81736),
-                          ),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                    ),
+                    _buildTextField(
+                        controller: _aiouser, label: 'AIO Username'),
+                    _buildTextField(controller: _aiokey, label: 'AIO Key'),
+                    _buildTextField(controller: _phone, label: 'Phone number'),
+                    const SizedBox(height: 20),
+                    _buildSignUpButton_1(context),
                   ],
                   if (_isVerificationCodeVisible) ...[
                     const Text(
@@ -292,7 +226,7 @@ class _RegisterState extends State<Register> {
                           ElevatedButton(
                             onPressed: () {
                               startTimer();
-                              // Handle send verification code action
+                              _sendcode();
                             },
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.zero,
@@ -331,6 +265,7 @@ class _RegisterState extends State<Register> {
                       ],
                     ),
                     const SizedBox(height: 20),
+                    _buildSignUpButton_2(context),
                   ],
                   const SizedBox(height: 20),
                   Row(
@@ -360,8 +295,6 @@ class _RegisterState extends State<Register> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  _buildSignUpButton(context),
                 ],
               ),
             ),
@@ -371,7 +304,7 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  Widget _buildSignUpButton(BuildContext context) {
+  Widget _buildSignUpButton_1(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 55,
@@ -385,49 +318,32 @@ class _RegisterState extends State<Register> {
           ),
         ),
         onPressed: () async {
-          if (_isCodeSent) {
-            await _handleOnClick(context);
-          } else {
-            // Nếu chưa gửi mã, thực hiện gửi mã
-            if (_username.text.isEmpty ||
-                _emailController.text.isEmpty ||
-                _passwordController_1.text.isEmpty ||
-                _aiouser.text.isEmpty ||
-                _aiokey.text.isEmpty ||
-                _phone.text.isEmpty) {
-              setState(() {
-                _errorMessage = 'Vui lòng nhập đủ thông tin';
-              });
-              return;
-            }
-
-            if (!_emailController.text.isValidEmail()) {
-              setState(() {
-                _errorMessage = 'Vui lòng nhập đúng định dạng email';
-              });
-              return;
-            }
-
-            if (_passwordController_1.text != _passwordController_2.text) {
-              setState(() {
-                _errorMessage = 'Mật khẩu không trùng nhau';
-              });
-              return;
-            }
-
+          if (_username.text.isEmpty ||
+              _emailController.text.isEmpty ||
+              _passwordController_1.text.isEmpty ||
+              _aiouser.text.isEmpty ||
+              _aiokey.text.isEmpty ||
+              _phone.text.isEmpty) {
             setState(() {
-              _errorMessage = null;
+              _errorMessage = 'Vui lòng nhập đủ thông tin';
             });
-
-            bool success = await fetchSendcode(_emailController.text);
-            if (success) {
-              setState(() {
-                _isCodeSent = true;
-                _isVerificationCodeVisible = true;
-                startTimer();
-              });
-            }
+            return;
           }
+
+          if (!_emailController.text.isValidEmail()) {
+            setState(() {
+              _errorMessage = 'Email không đúng định dạng';
+            });
+            return;
+          }
+
+          if (_passwordController_1.text != _passwordController_2.text) {
+            setState(() {
+              _errorMessage = 'Mật khẩu không khớp';
+            });
+            return;
+          }
+          _sendcode();
         },
         child: Ink(
           decoration: BoxDecoration(
@@ -438,15 +354,100 @@ class _RegisterState extends State<Register> {
           ),
           child: Container(
             alignment: Alignment.center,
-            child: Text(
-              _isCodeSent ? 'Register' : 'Send Code', // Thay đổi nhãn nút
-              style: const TextStyle(
+            child: const Text(
+              'Sign Up',
+              style: TextStyle(
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
                 color: Colors.white,
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignUpButton_2(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 55,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        onPressed: () => _handleOnClick(context),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            gradient: const LinearGradient(
+              colors: [Color(0xffB81736), Color(0xff281537)],
+            ),
+          ),
+          child: Container(
+            alignment: Alignment.center,
+            child: const Text(
+              'Confirm Sign Up',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        label: Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xffB81736),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: !_passwordVisible,
+      decoration: InputDecoration(
+        label: Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xffB81736),
+          ),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _passwordVisible ? Icons.visibility : Icons.visibility_off,
+            color: const Color(0xffB81736),
+          ),
+          onPressed: () {
+            setState(() {
+              _passwordVisible = !_passwordVisible;
+            });
+          },
         ),
       ),
     );
