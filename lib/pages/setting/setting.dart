@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:ui'; // Required for BackdropFilter
 import 'package:frontend_daktmt/nav_bar/nav_bar_left.dart';
 import 'package:frontend_daktmt/pages/upgrade/upgrade.dart';
+import 'package:frontend_daktmt/responsive.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -17,22 +17,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
+    
     return Scaffold(
       drawer: const Navbar_left(),
       appBar: AppBar(
         title: const Text('Settings'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.symmetric(horizontal: isMobile ? 18.0 : 500.0 ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Settings wrapped in bordered container
+            // Container chứa các cài đặt
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0), // Điều chỉnh padding
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0), // Bo tròn góc
+                boxShadow:const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 6.0,
+                    offset: Offset(0, 3), // Độ lệch bóng
+                  ),
+                ],
+                border: Border.all(color: Colors.grey.shade300), // Đường viền
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,33 +56,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Language'),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0), // Điều chỉnh khoảng cách ở đây
-                            child: DropdownButton<String>(
-                              value: selectedLanguage,
-                              items: <String>['English', 'Vietnamese']
-                                  .map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedLanguage = newValue!;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Language'),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: DropdownButton<String>(
+                          value: selectedLanguage,
+                          items: <String>['English', 'Vietnamese']
+                              .map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedLanguage = newValue!;
+                            });
+                          },
+                        ),
                       ),
-
-                  const SizedBox(height: 20),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -94,11 +103,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        // Save settings logic here
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Settings saved')),
                         );
@@ -110,57 +118,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 30),
-            // Upgrade section with blurred image and rounded corners
             Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16), // Rounded corners for the container
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                        child: Container(
-                          width: 100,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20), // Ensure this also has rounded corners
-                            image: const DecorationImage(
-                              image: AssetImage('assets/cardOCB.png'), // Your image path here
-        
-                            ),
-                          ),
-                        ),
-                      ),
-                    Positioned.fill(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0), // Blur only the background
-                        child: Container(
-                          color: Colors.black.withOpacity(0), // Invisible container for blur effect
-                        ),
+              child: Stack(
+                children: [
+                  // Hình nền được chứa trong một container
+                  Container(
+                    width: double.infinity,
+                    height: isMobile ? 250.0 : 300.0, // Điều chỉnh chiều cao theo màn hình
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20), // Bo tròn góc cho hình nền
+                      image: const DecorationImage(
+                        image: AssetImage('assets/cardOCB.png'),
+                        fit: BoxFit.cover, // Giúp hình ảnh phủ kín container
                       ),
                     ),
-                    // Positioned text above the button
-                    // const Positioned(
-                    //   top: 50, // Adjust the position to place text above the button
-                    //   left: 0,
-                    //   right: 0,
-                    //   child: Center(
-                    //     child: Text(
-                    //       'You can get a lot more by upgrading to premium. Get all features now.',
-                    //       style: TextStyle(
-                    //         fontSize: 20,
-                    //         fontWeight: FontWeight.bold,
-                    //         color: Colors.white,
-                    //         shadows: [
-                    //           Shadow(
-                    //             blurRadius: 10.0,
-                    //             color: Colors.black,
-                    //             offset: Offset(3, 3),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                    // // Positioned button below the text
-                    Center(
+                  ),
+                  // Nút "Upgrade Account"
+                  Positioned(
+                    bottom: isMobile ? 300.0 : 150.0, 
+                    left: 0, // Căn trái
+                    right: 0, // Căn phải
+                    child: Center(
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -171,8 +149,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: const Text('Upgrade Account'),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -181,4 +159,3 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
-

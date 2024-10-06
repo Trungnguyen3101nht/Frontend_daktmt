@@ -76,10 +76,12 @@ class humigauge extends StatelessWidget {
     super.key,
     required this.gaugeHeight,
     required this.gaugeWidth,
+    required this.value, // Thêm thuộc tính value
   });
 
   final double gaugeHeight;
   final double gaugeWidth;
+  final double value; // Giá trị độ ẩm động
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +89,7 @@ class humigauge extends StatelessWidget {
       child: SizedBox(
         height: gaugeHeight,
         width: gaugeWidth,
-        child: const GaugeWidget(label: 'Humidity', value: 60.0),
+        child: GaugeWidget(label: 'Humidity', value: value), // Truyền giá trị value động
       ),
     );
   }
@@ -99,10 +101,12 @@ class tempgauge extends StatelessWidget {
     super.key,
     required this.gaugeHeight,
     required this.gaugeWidth,
+    required this.value, // Thêm thuộc tính value
   });
 
   final double gaugeHeight;
   final double gaugeWidth;
+  final double value; // Giá trị nhiệt độ động
 
   @override
   Widget build(BuildContext context) {
@@ -110,8 +114,9 @@ class tempgauge extends StatelessWidget {
       child: SizedBox(
         height: gaugeHeight,
         width: gaugeWidth,
-        child: const GaugeWidget(label: 'Temperature', value: 25.0),
+        child: GaugeWidget(label: 'Temperature', value: value), // Truyền giá trị value động
       ),
     );
   }
 }
+

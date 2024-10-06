@@ -71,7 +71,7 @@ class OnOffSwitch extends StatelessWidget {
           Text(
             state ? 'On' : 'Off', // Hiển thị trạng thái On/Off
             style:TextStyle(
-              color: state ? const Color.fromARGB(255, 0, 94, 245) : const Color.fromARGB(255, 254, 2, 2) , // Màu cho On/Off
+              color: state ? const Color.fromARGB(255, 72, 255, 0) : const Color.fromARGB(255, 254, 2, 2) , // Màu cho On/Off
               fontWeight: FontWeight.bold,
               fontSize: 18.0,
             ),

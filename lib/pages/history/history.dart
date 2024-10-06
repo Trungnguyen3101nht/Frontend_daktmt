@@ -53,59 +53,76 @@ class _HistoryScreenState extends State<HistoryScreen> {
       appBar: AppBar(
         title: const Text('History'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => _selectDate(context, true),
-                        child: Text(_startDate == null
-                            ? 'Start'
-                            : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => _selectDate(context, false),
-                        child: Text(_endDate == null
-                            ? 'End'
-                            : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'),
-                      ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: _search,
-                  child: const Text('Search'),
-                ),
-              ],
-            ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.0), // Bo góc 8 đơn vị
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6.0,
+                offset: Offset(0, 3), // Độ lệch của bóng
+              ),
+            ],
           ),
-          const Divider(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 20, // Giả định có 20 lịch sử, bạn có thể thay bằng dữ liệu thực tế
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: const Icon(Icons.history),
-                  title: Text('#${index + 1}'),
-                  subtitle: Text('${DateTime.now().subtract(Duration(days: index))}'),
-                );
-              },
-            ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _selectDate(context, true),
+                            child: Text(_startDate == null
+                                ? 'Start'
+                                : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _selectDate(context, false),
+                            child: Text(_endDate == null
+                                ? 'End'
+                                : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: _search,
+                      child: const Text('Search'),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 20, // Giả định có 20 lịch sử
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      leading: const Icon(Icons.history),
+                      title: Text('#${index + 1}'),// cho các giá trị thay đổi
+                      subtitle: Text('${DateTime.now().subtract(Duration(days: index))}'),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
