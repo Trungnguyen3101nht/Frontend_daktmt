@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double humidity = 0.0;
   double temperature = 0.0;
   final ApiService apiService = ApiService();
-  String token = 'token';
+  String token = 'accesstoken';
 
   @override
   void initState() {
