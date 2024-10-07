@@ -22,6 +22,7 @@ class map extends StatelessWidget {
       child: SizedBox(
         height: gaugeHeight,
         width: gaugeWidth,
+        
         child: FlutterMap(
           options: const MapOptions(
             initialCenter: LatLng(10.879569567979344, 106.80568875364565), 

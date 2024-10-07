@@ -7,53 +7,55 @@ class Navbar_left extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          
-          ListTile(
+      child: Padding( // Thêm Padding vào đây
+        padding: const EdgeInsets.only(top: 20.0), // Cách lề trên 10 đơn vị
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            ListTile(
               leading: const Icon(Icons.home),
               title: const Text('Home'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/home');
               }),
-          ListTile(
+            ListTile(
               leading: const Icon(Icons.history),
               title: const Text('History'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/history');
               }),
-          ListTile(
+            ListTile(
               leading: const Icon(Icons.replay),
               title: const Text('Relay'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/relay');
               }),
-          ListTile(
+            ListTile(
               leading: const Icon(Icons.schedule),
               title: const Text('Schedule'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/schedule');
               }),
-          ListTile(
+            ListTile(
               leading: const Icon(Icons.people),
               title: const Text('Profile'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/profile');
               }),
-          ListTile(
+            ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Setting'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/setting');
               }),
-              const Divider(),
-          ListTile(
+            const Divider(),
+            ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Sign Out'),
               // ignore: avoid_print
               onTap: () => print('Logout tapped')),
-        ],
+          ],
+        ),
       ),
     );
   }

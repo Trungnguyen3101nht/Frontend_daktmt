@@ -51,10 +51,10 @@ class OnOffSwitch extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: const Color.fromARGB(255, 253, 253, 254).withOpacity(0.3),
+          color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.3),
           width: 2.0,
         ), 
-        color: const Color.fromARGB(255, 252, 251, 251).withOpacity(0.6),
+        color: const Color.fromARGB(255, 252, 251, 251),
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Column(
@@ -71,7 +71,7 @@ class OnOffSwitch extends StatelessWidget {
           Text(
             state ? 'On' : 'Off', // Hiển thị trạng thái On/Off
             style:TextStyle(
-              color: state ? const Color.fromARGB(255, 72, 255, 0) : const Color.fromARGB(255, 254, 2, 2) , // Màu cho On/Off
+              color: state ? const Color.fromARGB(255, 46, 163, 0) : const Color.fromARGB(255, 254, 2, 2) , // Màu cho On/Off
               fontWeight: FontWeight.bold,
               fontSize: 18.0,
             ),
