@@ -1,6 +1,36 @@
 import 'package:flutter/material.dart';
 
 // ignore: camel_case_types
+class nabarright_set extends StatelessWidget {
+  const nabarright_set({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 40,
+      right: 16,
+      child: Builder(
+        builder: (context) => GestureDetector(
+          onTap: () {
+            Scaffold.of(context).openEndDrawer();
+          },
+          child: ClipOval(
+            child: Image.asset(
+              'assets/hcmut.png',
+              width: 30,
+              height: 30,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ignore: camel_case_types
 class Navbar_right extends StatelessWidget {
   const Navbar_right({super.key});
 

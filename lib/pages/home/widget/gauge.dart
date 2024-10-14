@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
-import 'package:frontend_daktmt/pages/home/home.dart';
+import 'package:frontend_daktmt/custom_card.dart';
 
 class GaugeWidget extends StatelessWidget {
   final String label;
@@ -25,9 +25,7 @@ class GaugeWidget extends StatelessWidget {
     }
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Phần Gauge được bọc bởi Expanded
         Expanded(
           child: SizedBox(
             height: 170,
@@ -95,23 +93,26 @@ class GaugeWidget extends StatelessWidget {
             ),
           ),
         ),
-        // Ghi chú màu bên phải với dấu chấm
+
+
         Container(
-          margin: const EdgeInsets.only(
-              left: 5, top: 20), // Khoảng cách giữa gauge và ghi chú màu
+          margin: const EdgeInsets.only(left: 5, top: 5),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(162, 243, 243, 243),
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              const SizedBox(
+                height: 30,
+                width: 90,
               ),
-              // Dấu chấm và ghi chú cho 'Low'
               Row(
                 children: [
                   Container(
-                    width: 10,
+                    width: 20,
                     height: 10,
                     decoration: const BoxDecoration(
                       color: Colors.green,
@@ -127,7 +128,7 @@ class GaugeWidget extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 10,
+                    width: 20,
                     height: 10,
                     decoration: const BoxDecoration(
                       color: Colors.yellow,
@@ -135,7 +136,7 @@ class GaugeWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 5),
-                  const Text('Medium Low'),
+                  const Text('Med Low'),
                 ],
               ),
               const SizedBox(height: 5),
@@ -143,7 +144,7 @@ class GaugeWidget extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 10,
+                    width: 20,
                     height: 10,
                     decoration: const BoxDecoration(
                       color: Colors.orange,
@@ -159,7 +160,7 @@ class GaugeWidget extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 10,
+                    width: 20,
                     height: 10,
                     decoration: const BoxDecoration(
                       color: Colors.red,
@@ -170,7 +171,6 @@ class GaugeWidget extends StatelessWidget {
                   const Text('High'),
                 ],
               ),
-              
             ],
           ),
         ),
@@ -194,12 +194,20 @@ class humigauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BorderedContainer(
-      child: SizedBox(
-        height: gaugeHeight,
-        width: gaugeWidth,
-        child: GaugeWidget(
-            label: 'Humidity', value: value), 
+    return CustomCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, // Căn trái cho tất cả
+        children: [
+          const Text(
+            '- Humidity💧-',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: gaugeHeight,
+            width: gaugeWidth,
+            child: GaugeWidget(label: 'Humidity', value: value),
+          ),
+        ],
       ),
     );
   }
@@ -220,12 +228,20 @@ class tempgauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BorderedContainer(
-      child: SizedBox(
-        height: gaugeHeight,
-        width: gaugeWidth,
-        child: GaugeWidget(
-            label: 'Temperature', value: value), 
+    return CustomCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, // Căn trái cho tất cả
+        children: [
+          const Text(
+            '- Temperature🌡️-',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: gaugeHeight,
+            width: gaugeWidth,
+            child: GaugeWidget(label: 'Temperature', value: value),
+          ),
+        ],
       ),
     );
   }
