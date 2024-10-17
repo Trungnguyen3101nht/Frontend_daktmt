@@ -14,6 +14,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String email = 'user@example.com';
   String phone = '0123456789';
   String address = '123 Main St';
+  // String username = 'Username';
+  // String email = 'user@example.com';
+  // String phone = '0123456789';
+  // String address = '123 Main St';
+  
+  
+  
 
   // Biến để kiểm soát trạng thái chỉnh sửa
   bool isEditing = false;
@@ -50,6 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       drawer: const Navbar_left(),
       appBar: AppBar(
         title: const Text('Profile'),
@@ -95,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Avatar
               const CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage('https://example.com/avatar.jpg'), // Thay bằng URL avatar
+                backgroundImage: NetworkImage('assets/hcmut.png'), 
               ),
               const SizedBox(height: 16),
               // Thông tin người dùng

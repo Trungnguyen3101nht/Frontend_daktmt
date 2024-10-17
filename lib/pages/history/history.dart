@@ -49,6 +49,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       drawer: const Navbar_left(),
       appBar: AppBar(
         title: const Text('History'),

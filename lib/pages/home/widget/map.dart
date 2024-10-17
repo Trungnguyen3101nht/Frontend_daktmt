@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:frontend_daktmt/custom_card.dart';
 
+// ignore: camel_case_types
 class map extends StatefulWidget {
   const map({super.key, required this.mapHeight, required this.mapWidth});
 
@@ -75,47 +77,49 @@ class _mapState extends State<map> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: widget.mapHeight,
-      width: widget.mapWidth,
-      child: FlutterMap(
-        options: MapOptions(
-          initialCenter: _deviceLocation ??
-              _locationA, // Trung tâm là vị trí của thiết bị nếu có
-          initialZoom: 15,
-        ),
-        children: [
-          TileLayer(
-            urlTemplate:
-                'https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=pqZwfqHFA5XexcvOOXeb',
-            subdomains: const ['a', 'b', 'c'],
+    return CustomCard(
+      child: SizedBox(
+        height: widget.mapHeight,
+        width: widget.mapWidth,
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: _deviceLocation ??
+                _locationA, // Trung tâm là vị trí của thiết bị nếu có
+            initialZoom: 15,
           ),
-          MarkerLayer(
-            markers: [
-              if (_deviceLocation != null)
+          children: [
+            TileLayer(
+              urlTemplate:
+                  'https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=pqZwfqHFA5XexcvOOXeb',
+              subdomains: const ['a', 'b', 'c'],
+            ),
+            MarkerLayer(
+              markers: [
+                if (_deviceLocation != null)
+                  Marker(
+                    point: _deviceLocation!,
+                    width: 40,
+                    height: 40,
+                    child: const Icon(
+                      Icons.location_on,
+                      size: 40.0,
+                      color: Colors.blue,
+                    ),
+                  ),
                 Marker(
-                  point: _deviceLocation!,
+                  point: _locationA,
                   width: 40,
                   height: 40,
                   child: const Icon(
                     Icons.location_on,
                     size: 40.0,
-                    color: Colors.blue,
+                    color: Colors.red,
                   ),
                 ),
-              Marker(
-                point: _locationA,
-                width: 40,
-                height: 40,
-                child: const Icon(
-                  Icons.location_on,
-                  size: 40.0,
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

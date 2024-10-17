@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_daktmt/responsive.dart';
 
 // ignore: camel_case_types
 class noitification_setting extends StatelessWidget {
@@ -8,6 +9,10 @@ class noitification_setting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final isMobile = Responsive.isMobile(context);
+    final isDesktop = Responsive.isDesktop(context);
+    final bool isRowLayout = isDesktop;
+
     return Positioned(
       top: 30,
       right: 55,
@@ -23,7 +28,7 @@ class noitification_setting extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: Container(
                     height: MediaQuery.of(context).size.height * 0.8,
-                    width: 300,
+                    width: isRowLayout ? 300 : MediaQuery.of(context).size.width * 0.9,
                     margin: const EdgeInsets.only(top: 16, right: 16),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -41,12 +46,12 @@ class noitification_setting extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Thông báo',
+                          'Noitifications',
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 10),
-                        Text('Noitifications'),
+                        Text('lêu lêu'),
                         SizedBox(height: 20),
                       ],
                     ),

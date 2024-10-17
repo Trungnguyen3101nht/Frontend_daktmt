@@ -112,14 +112,14 @@ class TempChart extends StatelessWidget {
                         return bottomTitle[value.toInt()] != null
                             ? SideTitleWidget(
                                 axisSide: meta.axisSide,
-                                space: 10,
+                                space: 5,
                                 child: Text(
                                   bottomTitle[value.toInt()].toString(),
                                   style: TextStyle(
-                                      fontSize: Responsive.isMobile(context)
-                                          ? 9
-                                          : 12,
-                                      color: Colors.grey[400]),
+                                      fontSize:
+                                          Responsive.isMobile(context) ? 9 : 12,
+                                      color:
+                                          const Color.fromARGB(255, 0, 0, 0)),
                                 ),
                               )
                             : const SizedBox();
@@ -138,15 +138,14 @@ class TempChart extends StatelessWidget {
                         return leftTitle[value.toInt()] != null
                             ? Text(leftTitle[value.toInt()].toString(),
                                 style: TextStyle(
-                                    fontSize: Responsive.isMobile(context)
-                                        ? 9
-                                        : 12,
-                                    color: Colors.grey[400]))
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 9 : 12,
+                                    color: const Color.fromARGB(255, 0, 0, 0)))
                             : const SizedBox();
                       },
                       showTitles: true,
                       interval: 1,
-                      reservedSize: 40,
+                      reservedSize: 30,
                     ),
                   ),
                 ),
@@ -154,8 +153,8 @@ class TempChart extends StatelessWidget {
                 lineBarsData: [
                   LineChartBarData(
                       isCurved: true,
-                      curveSmoothness: 0,
-                      color: Theme.of(context).primaryColor,
+                      curveSmoothness: 0.2,
+                      color: const Color.fromARGB(48, 255, 1, 1),
                       barWidth: 2.5,
                       isStrokeCapRound: true,
                       belowBarData: BarAreaData(
@@ -184,8 +183,6 @@ class TempChart extends StatelessWidget {
     );
   }
 }
-
-
 
 class HumiChart extends StatelessWidget {
   HumiChart({
@@ -296,14 +293,14 @@ class HumiChart extends StatelessWidget {
                         return bottomTitle[value.toInt()] != null
                             ? SideTitleWidget(
                                 axisSide: meta.axisSide,
-                                space: 10,
+                                space: 5,
                                 child: Text(
                                   bottomTitle[value.toInt()].toString(),
                                   style: TextStyle(
-                                      fontSize: Responsive.isMobile(context)
-                                          ? 9
-                                          : 12,
-                                      color: Colors.grey[400]),
+                                      fontSize:
+                                          Responsive.isMobile(context) ? 9 : 12,
+                                      color:
+                                          const Color.fromARGB(255, 0, 0, 0)),
                                 ),
                               )
                             : const SizedBox();
@@ -322,15 +319,14 @@ class HumiChart extends StatelessWidget {
                         return leftTitle[value.toInt()] != null
                             ? Text(leftTitle[value.toInt()].toString(),
                                 style: TextStyle(
-                                    fontSize: Responsive.isMobile(context)
-                                        ? 9
-                                        : 12,
-                                    color: Colors.grey[400]))
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 9 : 12,
+                                    color: const Color.fromARGB(255, 0, 0, 0)))
                             : const SizedBox();
                       },
                       showTitles: true,
                       interval: 1,
-                      reservedSize: 40,
+                      reservedSize: 30,
                     ),
                   ),
                 ),
@@ -338,8 +334,8 @@ class HumiChart extends StatelessWidget {
                 lineBarsData: [
                   LineChartBarData(
                       isCurved: true,
-                      curveSmoothness: 0,
-                      color: Theme.of(context).primaryColor,
+                      curveSmoothness: 0.2,
+                      color: const Color.fromARGB(47, 1, 69, 255),
                       barWidth: 2.5,
                       isStrokeCapRound: true,
                       belowBarData: BarAreaData(
@@ -348,7 +344,7 @@ class HumiChart extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Theme.of(context).primaryColor.withOpacity(0.5),
-                            const Color.fromARGB(48, 255, 1, 1)
+                            const Color.fromARGB(47, 1, 69, 255)
                           ],
                         ),
                         show: true,

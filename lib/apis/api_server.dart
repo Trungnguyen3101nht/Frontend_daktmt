@@ -1,14 +1,12 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
+import 'dart:convert'; // Import for JSON encoding/decoding
+import 'package:http/http.dart'
+    as http; // Import HTTP package for making requests
+import 'package:shared_preferences/shared_preferences.dart'; // Import for storing data
 
-// Hàm lấy độ ẩm
-Future<double?> fetchHumidity(String token, BuildContext context) async {
-  final url = Uri.parse('http://10.28.128.67:8080/sensor/humi');
-
+Future<double> fetchHumidityData(String token) async {
   try {
     final response = await http.get(
-      url,
+      Uri.parse('http://hcmut.zapto.org:8080/sensor/get/humi'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -17,32 +15,28 @@ Future<double?> fetchHumidity(String token, BuildContext context) async {
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      final humidity = result['data'];
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Độ ẩm: $humidity")),
-      );
-      return humidity; // Trả về giá trị độ ẩm
+      print(json.encode(result));
+
+      double humidity = result['data']; // Lấy giá trị độ ẩm (double)
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble('humidity', humidity); // Lưu độ ẩm dưới dạng double
+
+      return humidity; // Trả về giá trị độ ẩm dạng double
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lỗi khi lấy độ ẩm: ${response.statusCode}")),
-      );
-      return null;
+      final result = json.decode(response.body);
+      print('Error: ${result['error']}');
     }
   } catch (error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Lỗi kết nối khi lấy độ ẩm")),
-    );
-    return null;
+    print('Error fetching humidity data: $error');
   }
+  return 0.0; // Trả về giá trị mặc định nếu có lỗi
 }
 
-// Hàm lấy nhiệt độ
-Future<double?> fetchTemperature(String token, BuildContext context) async {
-  final url = Uri.parse('http://10.28.128.67:8080/sensor/temp');
-
+Future<double> fetchTemperatureData(String token) async {
   try {
     final response = await http.get(
-      url,
+      Uri.parse('http://hcmut.zapto.org:8080/sensor/get/temp'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -51,21 +45,21 @@ Future<double?> fetchTemperature(String token, BuildContext context) async {
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      final temperature = result['data'];
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Nhiệt độ: $temperature")),
-      );
-      return temperature; // Trả về giá trị nhiệt độ
+      print(json.encode(result));
+
+      double temperature = result['data']; // Lấy giá trị nhiệt độ (double)
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(
+          'temperature', temperature); // Lưu nhiệt độ dưới dạng double
+
+      return temperature; // Trả về giá trị nhiệt độ dạng double
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lỗi khi lấy nhiệt độ: ${response.statusCode}")),
-      );
-      return null;
+      final result = json.decode(response.body);
+      print('Error: ${result['error']}');
     }
   } catch (error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Lỗi kết nối khi lấy nhiệt độ")),
-    );
-    return null;
+    print('Error fetching temperature data: $error');
   }
+  return 0.0; // Trả về giá trị mặc định nếu có lỗi
 }

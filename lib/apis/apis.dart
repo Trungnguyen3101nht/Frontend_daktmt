@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> fetchSignIn(TextEditingController emailController,
     TextEditingController passwordController, BuildContext context) async {
-  final url = Uri.parse('http://10.28.128.67:8080/login');
+  final url = Uri.parse('http://hcmut.zapto.org:8080/login');
   try {
     String convertEmail = emailController.text.toLowerCase();
     final response = await http.post(
@@ -42,7 +42,7 @@ Future<bool> fetchRegister(
     TextEditingController aiokey,
     TextEditingController phone,
     BuildContext context) async {
-  final url = Uri.parse('http://10.28.128.67:8080/register');
+  final url = Uri.parse('http://hcmut.zapto.org:8080/register');
   try {
     String convertUsername = username.text.toLowerCase();
     String convertEmail = emailController.text.toLowerCase();
@@ -85,7 +85,7 @@ Future<bool> fetchRegister(
 
 Future<bool> fetchForgetPassword(TextEditingController emailController,
     TextEditingController passwordController, BuildContext context) async {
-  final url = Uri.parse('http://10.28.128.67:8080/forgot-password');
+  final url = Uri.parse('http://hcmut.zapto.org:8080/forgot-password');
   try {
     String convertEmail = emailController.text.toLowerCase();
     final response = await http.patch(
@@ -120,7 +120,7 @@ Future<bool> fetchForgetPassword(TextEditingController emailController,
 }
 
 Future<bool> fetchSendcode(String email) async {
-  final url = Uri.parse('http://10.28.128.67:8080/email/send-code');
+  final url = Uri.parse('http://hcmut.zapto.org:8080/email/send-code');
   try {
     String convertEmail = email.toLowerCase();
     final response = await http.post(
@@ -147,7 +147,7 @@ Future<bool> fetchSendcode(String email) async {
 }
 
 Future<bool> fetchConfirmcode(String email, String code) async {
-  final url = Uri.parse('http://10.28.128.67:8080/email/confirm-code');
+  final url = Uri.parse('http://hcmut.zapto.org:8080/email/confirm-code');
   try {
     String convertEmail = email.toLowerCase();
     final response = await http.post(
