@@ -7,8 +7,10 @@ import 'package:frontend_daktmt/pages/profile/profile.dart';
 import 'package:frontend_daktmt/pages/relay/relay.dart';
 import 'package:frontend_daktmt/pages/schedule/schedule.dart';
 import 'package:frontend_daktmt/pages/setting/setting.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(); 
   runApp(const MyApp());
 }
 

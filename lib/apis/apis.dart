@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<bool> fetchSignIn(TextEditingController emailController,
     TextEditingController passwordController, BuildContext context) async {
-  final url = Uri.parse('http://hcmut.zapto.org:8080/login');
+  final baseUrl = dotenv.env['API_BASE_URL']!;
+  final url = Uri.parse('http://$baseUrl/login');
+
   try {
     String convertEmail = emailController.text.toLowerCase();
     final response = await http.post(
@@ -44,7 +47,9 @@ Future<bool> fetchRegister(
     TextEditingController aiokey,
     TextEditingController phone,
     BuildContext context) async {
-  final url = Uri.parse('http://hcmut.zapto.org:8080/register');
+  final baseUrl = dotenv.env['API_BASE_URL']!;
+  final url = Uri.parse('http://$baseUrl/register');
+
   try {
     String convertUsername = username.text.toLowerCase();
     String convertEmail = emailController.text.toLowerCase();
@@ -87,7 +92,9 @@ Future<bool> fetchRegister(
 
 Future<bool> fetchForgetPassword(TextEditingController emailController,
     TextEditingController passwordController, BuildContext context) async {
-  final url = Uri.parse('http://hcmut.zapto.org:8080/forgot-password');
+  final baseUrl = dotenv.env['API_BASE_URL']!;
+  final url = Uri.parse('http://$baseUrl/forgot-password');
+
   try {
     String convertEmail = emailController.text.toLowerCase();
     final response = await http.patch(
@@ -122,7 +129,8 @@ Future<bool> fetchForgetPassword(TextEditingController emailController,
 }
 
 Future<bool> fetchSendcode(String email) async {
-  final url = Uri.parse('http://hcmut.zapto.org:8080/email/send-code');
+  final baseUrl = dotenv.env['API_BASE_URL']!;
+  final url = Uri.parse('http://$baseUrl/email/send-code');
   try {
     String convertEmail = email.toLowerCase();
     final response = await http.post(
@@ -149,7 +157,8 @@ Future<bool> fetchSendcode(String email) async {
 }
 
 Future<bool> fetchConfirmcode(String email, String code) async {
-  final url = Uri.parse('http://hcmut.zapto.org:8080/email/confirm-code');
+  final baseUrl = dotenv.env['API_BASE_URL']!;
+  final url = Uri.parse('http://$baseUrl/email/confirm-code');
   try {
     String convertEmail = email.toLowerCase();
     final response = await http.post(

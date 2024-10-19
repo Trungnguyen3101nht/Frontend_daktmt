@@ -2,11 +2,12 @@ import 'dart:convert'; // Import for JSON encoding/decoding
 import 'package:http/http.dart'
     as http; // Import HTTP package for making requests
 import 'package:shared_preferences/shared_preferences.dart'; // Import for storing data
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 Future<double> fetchHumidityData(String token) async {
   try {
+    final baseUrl = dotenv.env['API_BASE_URL']!;
     final response = await http.get(
-      Uri.parse('http://hcmut.zapto.org:8080/sensor/get/humi'),
+      Uri.parse('http://$baseUrl/sensor/get/humi'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -35,8 +36,9 @@ Future<double> fetchHumidityData(String token) async {
 
 Future<double> fetchTemperatureData(String token) async {
   try {
+    final baseUrl = dotenv.env['API_BASE_URL']!;
     final response = await http.get(
-      Uri.parse('http://hcmut.zapto.org:8080/sensor/get/temp'),
+      Uri.parse('http://$baseUrl/sensor/get/temp'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

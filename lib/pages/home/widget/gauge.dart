@@ -14,11 +14,11 @@ class GaugeWidget extends StatelessWidget {
 
     // Xác định màu sắc ghi chú dựa trên giá trị
     Color annotationColor;
-    if (value < 20) {
+    if (value < 60) {
       annotationColor = Colors.green; // Giá trị thấp
-    } else if (value < 60) {
+    } else if (value < 75) {
       annotationColor = Colors.yellow; // Giá trị trung bình thấp
-    } else if (value < 85) {
+    } else if (value < 90) {
       annotationColor = Colors.orange; // Giá trị trung bình
     } else {
       annotationColor = Colors.red; // Giá trị cao
