@@ -18,6 +18,8 @@ Future<bool> fetchSignIn(TextEditingController emailController,
         'password': passwordController.text,
       }),
     );
+    print('Response status: ${response.statusCode}'); // In HTTP status code
+    print('Response body: ${response.body}');
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       SharedPreferences prefs = await SharedPreferences.getInstance();

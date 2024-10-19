@@ -16,9 +16,9 @@ class GaugeWidget extends StatelessWidget {
     Color annotationColor;
     if (value < 20) {
       annotationColor = Colors.green; // Giá trị thấp
-    } else if (value < 40) {
-      annotationColor = Colors.yellow; // Giá trị trung bình thấp
     } else if (value < 60) {
+      annotationColor = Colors.yellow; // Giá trị trung bình thấp
+    } else if (value < 85) {
       annotationColor = Colors.orange; // Giá trị trung bình
     } else {
       annotationColor = Colors.red; // Giá trị cao
@@ -28,64 +28,50 @@ class GaugeWidget extends StatelessWidget {
       children: [
         Expanded(
           child: SizedBox(
-            height: 170,
             child: SfRadialGauge(
               axes: <RadialAxis>[
                 RadialAxis(
-                  minimum: 0,
-                  maximum: 100,
-                  ranges: <GaugeRange>[
-                    GaugeRange(
-                        startValue: 0,
-                        endValue: 20,
-                        color: const Color.fromARGB(255, 1, 254, 10)),
-                    GaugeRange(
-                        startValue: 20,
-                        endValue: 40,
-                        color: const Color.fromARGB(255, 179, 255, 0)),
-                    GaugeRange(
-                        startValue: 40,
-                        endValue: 60,
-                        color: const Color.fromARGB(255, 255, 242, 0)),
-                    GaugeRange(
-                        startValue: 60,
-                        endValue: 80,
-                        color: const Color.fromARGB(255, 255, 187, 0)),
-                    GaugeRange(
-                        startValue: 80,
-                        endValue: 100,
-                        color: const Color.fromARGB(255, 255, 94, 0)),
-                  ],
+                  axisLineStyle: const AxisLineStyle(
+                    thickness: 15,
+                    cornerStyle: CornerStyle.bothCurve,
+                  ),
                   pointers: <GaugePointer>[
-                    NeedlePointer(
+                    RangePointer(
                       value: value,
-                      needleLength: 0.6,
-                      needleStartWidth: 1,
-                      needleEndWidth: 2,
-                      needleColor: Colors.red,
+                      cornerStyle: CornerStyle.bothCurve,
+                      enableAnimation: true,
+                      animationDuration: 1200,
+                      sizeUnit: GaugeSizeUnit.factor,
+                      gradient: SweepGradient(
+                        colors: label == 'Humidity'
+                            ? <Color>[
+                                const Color.fromARGB(255, 0, 132, 255), // Màu nếu giá trị là true
+                                const Color.fromARGB(255, 0, 26, 255),
+                              ]
+                            : <Color>[
+                                const Color.fromARGB(255, 184, 113, 113), // Màu nếu giá trị là false
+                                const Color.fromARGB(255, 255, 0, 0),
+                              ],
+                        stops: const <double>[0.25, 0.75],
+                      ),
+                      width: 0.15,
                     ),
                   ],
                   annotations: <GaugeAnnotation>[
                     GaugeAnnotation(
-                      widget: Container(
-                        decoration: BoxDecoration(
-                          color: annotationColor, // Màu sắc ghi chú
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Text(
-                            '${value.toStringAsFixed(1)} $unit',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white, // Màu chữ
-                            ),
+                      widget: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          '${value.toStringAsFixed(1)} $unit',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: annotationColor, // Màu chữ
                           ),
                         ),
                       ),
                       angle: 90,
-                      positionFactor: 0.7,
+                      positionFactor: 0.8,
                     ),
                   ],
                 ),
@@ -93,8 +79,6 @@ class GaugeWidget extends StatelessWidget {
             ),
           ),
         ),
-
-
         Container(
           margin: const EdgeInsets.only(left: 5, top: 5),
           decoration: BoxDecoration(

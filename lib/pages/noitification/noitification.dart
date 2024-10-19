@@ -14,8 +14,8 @@ class noitification_setting extends StatelessWidget {
     final bool isRowLayout = isDesktop;
 
     return Positioned(
-      top: 30,
-      right: 55,
+      top: isRowLayout ? 15 : 30,
+      right: isRowLayout ? 170 : 55,
       child: Builder(
         builder: (context) => IconButton(
           icon: const Icon(Icons.notifications, color: Colors.white),

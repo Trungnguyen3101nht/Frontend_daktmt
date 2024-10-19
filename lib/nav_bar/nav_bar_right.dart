@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_daktmt/responsive.dart';
 
 // ignore: camel_case_types
 class nabarright_set extends StatelessWidget {
@@ -8,9 +9,11 @@ class nabarright_set extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final bool isRowLayout = isDesktop;
     return Positioned(
-      top: 38,
-      right: 16,
+      top: isRowLayout? 20 : 38,
+      right: isRowLayout ? 130 : 16,
       child: Builder(
         builder: (context) => GestureDetector(
           onTap: () {

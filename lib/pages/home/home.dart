@@ -30,40 +30,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Function to fetch sensor data
   Future<void> fetchSensorData() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('accessToken');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('accessToken');
 
-    double humidityData = 0.00; 
-    double temperatureData = 0.00; 
+      double humidityData = 0.00;
+      double temperatureData = 0.00;
 
-    if (token == null || token.isEmpty) {
-      print('Access Token không tồn tại.');
-    } else {
-      // Fetch humidity data
-      humidityData = await fetchHumidityData(token);
+      if (token == null || token.isEmpty) {
+        print('Access Token không tồn tại.');
+      } else {
+        // Fetch humidity data
+        humidityData = await fetchHumidityData(token);
 
-      // Fetch temperature data
-      temperatureData = await fetchTemperatureData(token);
+        // Fetch temperature data
+        temperatureData = await fetchTemperatureData(token);
+      }
+
+      // Cập nhật trạng thái
+      setState(() {
+        humidity = humidityData; // Sử dụng '0' nếu không có giá trị
+        temperature = temperatureData; // Sử dụng '0' nếu không có giá trị
+      });
+    } catch (error) {
+      print("Error fetching sensor data: $error");
     }
-
-    // Cập nhật trạng thái
-    setState(() {
-      humidity = humidityData ; // Sử dụng '0' nếu không có giá trị
-      temperature = temperatureData ; // Sử dụng '0' nếu không có giá trị
-    });
-  } catch (error) {
-    print("Error fetching sensor data: $error");
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
     final isDesktop = Responsive.isDesktop(context);
-    final double horizontalPadding = isMobile ? 0.0 : 100;
-    final double verticalPadding = isMobile ? 0.0 : 100;
     final double gaugeHeight = isMobile ? 200.0 : 150.0;
     final double gaugeWidth = isMobile ? double.infinity : 100.0;
 
@@ -73,84 +70,122 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: const Navbar_left(),
       endDrawer: const Navbar_right(),
       body: SingleChildScrollView(
-        // Chuyển SingleChildScrollView lên đây
         child: Stack(
           children: [
             Container(
+              height: isRowLayout ? MediaQuery.of(context).size.height : null,
               decoration: backgound_Color(),
               child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding, vertical: verticalPadding),
+                padding: EdgeInsets.only(right: isMobile ? 0.0 : 50.0),
                 child: isRowLayout
-                    //!/ Layout dành cho desktop, tablets
-                    ? Column(
+                    ? Row(
                         children: [
-                          Column(
-                            children: [
-                              Row(
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius:
+                                      BorderRadius.circular(17), // Bo góc ở đây
+                                ),
+                                width: 300,
+                                height: MediaQuery.of(context)
+                                    .size
+                                    .height, // Sửa chiều cao ở đây
+
+                                child: const Navbar_left()),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10), // Thêm khoảng cách 2 bên
+                            child: VerticalDivider(
+                              width: 1, // Độ rộng tổng của VerticalDivider
+                              thickness: 2, // Độ dày của đường thẳng
+                              color: Color.fromARGB(
+                                  255, 255, 255, 255), // Màu của divider
+                              indent: 20, // Khoảng cách từ trên
+                              endIndent: 20, // Khoảng cách từ dưới
+                            ),
+                          ),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Column(
                                 children: [
-                                  const Expanded(
-                                    flex: 3,
-                                    child: Column(
-                                      children: [
-                                        toggle(
-                                          toggleHeight: 100.0,
-                                          toggleWidth: 600.0,
-                                          numOfRelay: 6,
-                                        ),
-                                        map(
-                                          mapHeight: 280.0,
-                                          mapWidth: 500,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
+                                  const SizedBox(height: 60),
                                   Expanded(
-                                    flex: 2,
-                                    child: Column(
-                                      children: [
-                                        tempgauge(
-                                          gaugeHeight: 195.0,
-                                          gaugeWidth: 500,
-                                          value: temperature,
-                                        ),
-                                        const SizedBox(height: 10),
-                                        humigauge(
-                                          gaugeHeight: 195.0,
-                                          gaugeWidth: 500,
-                                          value: humidity,
-                                        ),
-                                      ],
+                                    // Thêm Expanded ở đây
+                                    child: SingleChildScrollView(
+                                      // Bọc Column trong SingleChildScrollView
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Expanded(
+                                                flex: 3,
+                                                child: Column(
+                                                  children: [
+                                                    toggle(
+                                                      toggleHeight: 150.0,
+                                                      toggleWidth: 1000.0,
+                                                      numOfRelay: 6,
+                                                    ),
+                                                    map(
+                                                      mapHeight: 350.0,
+                                                      mapWidth: 1000,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                flex: 2,
+                                                child: Column(
+                                                  children: [
+                                                    tempgauge(
+                                                      gaugeHeight: 200.0,
+                                                      gaugeWidth: 600,
+                                                      value: temperature,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    humigauge(
+                                                      gaugeHeight: 200.0,
+                                                      gaugeWidth: 600,
+                                                      value: humidity,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: TempChart(
+                                                  gaugeHeight: 200.0,
+                                                  gaugeWidth: 80.0,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: HumiChart(
+                                                  gaugeHeight: 200.0,
+                                                  gaugeWidth: 2000.0,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: TempChart(
-                                      gaugeHeight: 200.0,
-                                      gaugeWidth: 80.0,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: HumiChart(
-                                      gaugeHeight: 200.0,
-                                      gaugeWidth: 2000.0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                            ],
-                          )
+                            ),
+                          ),
                         ],
                       )
-
-                    //!/ Layout dành cho mobile
                     : Column(
                         children: [
                           const SizedBox(height: 80.0),
@@ -160,7 +195,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             numOfRelay: 3,
                           ),
                           const SizedBox(height: 40),
-                          // Bao bọc các thành phần còn lại trong Container
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(10.0),
