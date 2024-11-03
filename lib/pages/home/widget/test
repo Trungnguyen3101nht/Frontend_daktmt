@@ -1,11 +1,14 @@
+// ignore_for_file: camel_case_types
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:frontend_daktmt/pages/home/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class Relay {
-  int id;
+  String id;
   String name;
   bool isOn;
 
@@ -14,18 +17,17 @@ class Relay {
   // fromJson method for JSON parsing
   factory Relay.fromJson(Map<String, dynamic> json) {
     return Relay(
-      id: json['relay_id'] ?? 'NULL',
-      name: json['relay_name'] ?? 'NULL',
-      isOn: json['state'] ?? false,
+      id: json['id'],
+      name: json['name'],
+      isOn: json['isOn'] ?? false,
     );
   }
 }
 
-class toggle extends StatefulWidget {
-  final double toggleHeight;
-  final double toggleWidth;
-  final int numOfRelay;
+List<Relay> relays = [];
+List<Relay> homeRelays = [];
 
+class toggle extends StatefulWidget {
   const toggle({
     super.key,
     required this.toggleHeight,
@@ -33,32 +35,25 @@ class toggle extends StatefulWidget {
     required this.numOfRelay,
   });
 
+  final double toggleHeight;
+  final double toggleWidth;
+  final int numOfRelay;
+
   @override
   _ToggleState createState() => _ToggleState();
 }
 
 class _ToggleState extends State<toggle> {
-  List<Relay> homeRelays = [];
-
   @override
   void initState() {
     super.initState();
     fetchHomeRelays();
-    print(homeRelays);
   }
 
   Future<void> fetchHomeRelays() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('accessToken') ?? '';
-
-    // Check if environment variable is loaded properly
-    final baseUrl = dotenv.env['API_BASE_URL'];
-    print(homeRelays);
-    if (baseUrl == null) {
-      print("Error: API_BASE_URL is not set in .env");
-      return;
-    }
-
+    var token = prefs.getString('accessToken') ?? '';
+    final baseUrl = dotenv.env['API_BASE_URL'] ?? '';
     final url = Uri.parse('http://$baseUrl/relay/get-home');
 
     try {
@@ -79,7 +74,6 @@ class _ToggleState extends State<toggle> {
                 .map<Relay>((relayJson) => Relay.fromJson(relayJson))
                 .toList();
           });
-          print(homeRelays);
           print("Successfully fetched home relays.");
         } else {
           print("Unexpected response format: ${response.body}");
