@@ -221,7 +221,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   void _editSchedule(int index) async {
+    // fetchSchedulesAPI();
+    // for (var day in _days) {
+    //   _selectedDays[day] = false;
+    // }
+    // _isSelectedRelays = List<bool>.filled(relays.length, false);
+    selectedRelays.clear();
+
     indexScheduleEdit = index;
+
+    await fetchRelaysAPI();
 
     // Set name
     _nameController.text = schedules[index].name;
@@ -234,19 +243,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     // Set time
     selectedTime = parseTimeString(schedules[index].time);
 
-    await fetchRelaysAPI();
-
     for (int i = 0; i < relays.length; i++) {
-      // Find the action for the current relay, allowing a null result if no match
       Action? relayAction = schedules[index].actions.firstWhere(
             (action) => action.relayId == int.tryParse(relays[i].id),
-            orElse: () => Action(
-                relayId: int.parse(relays[i].id),
-                action: "OFF"), // Provide a default Action if not found
+            orElse: () =>
+                Action(relayId: int.parse(relays[i].id), action: "OFF"),
           );
 
-      // Set isSetChedule based on the action's state
-      relays[i].isSetChedule = (relayAction.action == "ON");
+      relays[i].isSetChedule = (relayAction.action == "ON") ? true : false;
       _isSelectedRelays[i] = schedules[index]
           .actions
           .any((action) => action.relayId == int.tryParse(relays[i].id));
@@ -257,7 +261,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text("Edit Schedule"),
+              title: const Text("Edit Schedule de"),
               content: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -349,9 +353,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           return ListTile(
             leading: Checkbox(
               value: _isSelectedRelays[index],
-              onChanged: (bool? value) {
+              onChanged: (value) {
                 setState(() {
-                  _isSelectedRelays[index] = value ?? false;
+                  _isSelectedRelays[index] = value!;
                 });
               },
             ),
@@ -403,7 +407,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             List<Map<String, dynamic>> action = selectedRelays.map((relay) {
               return {
                 "relayId": relay.id,
-                "action": relay.isSetChedule ? "OFF" : "ON",
+                "action": relay.isSetChedule ? "ON" : "OFF",
               };
             }).toList();
             List<String> selectedDaysList = _selectedDays.entries
@@ -651,7 +655,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             List<Map<String, dynamic>> action = selectedRelays.map((relay) {
               return {
                 "relayId": relay.id,
-                "action": relay.isSetChedule ? "OFF" : "ON",
+                "action": relay.isSetChedule ? "ON" : "OFF",
               };
             }).toList();
             List<String> selectedDaysList = _selectedDays.entries
