@@ -1458,7 +1458,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           actions: [
             if (_showEditIcon)
               IconButton(
-                icon: const Icon(Icons.cancel),
+                icon: const Icon(Icons.cancel,
+                    color: Color.fromARGB(255, 255, 255, 255)),
                 onPressed: _resetToNormalMode,
               )
             else if (_showDeleteIcon)

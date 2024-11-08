@@ -746,24 +746,72 @@ class _RelayScreenState extends State<RelayScreen> {
     });
   }
 
-  AppBar _buildAppBar() {
-    return AppBar(
-      title: const Text('Relay', style: TextStyle(fontSize: 24)),
-      actions: [
-        if (_showEditIcon || _isAddToHomeMode)
-          IconButton(
-            icon: const Icon(Icons.cancel),
-            onPressed: _resetToNormalMode,
-          )
-        else if (_showDeleteIcon)
-          IconButton(
-            icon: const Icon(Icons.check_box_outlined),
-            onPressed: _toggleSelectMode,
+  PreferredSize _buildAppBar() {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(kToolbarHeight), // Set AppBar height
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 23, 80, 116),
+              Color.fromARGB(255, 7, 40, 75)
+            ], // Gradient colors
+            begin: Alignment.topLeft, // Start point of the gradient
+            end: Alignment.bottomRight, // End point of the gradient
           ),
-      ],
-      backgroundColor: Colors.blueAccent,
+        ),
+        child: AppBar(
+          title: const Text(
+            'Relay',
+            style: TextStyle(
+              fontSize: 24, // Set the font size
+              fontWeight: FontWeight.w600, // Semi-bold font weight
+              color: Colors.white, // Text color
+              letterSpacing: 1.2, // Letter spacing for readability
+              fontFamily: 'avenir', // Use a custom font family (optional)
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            if (_showEditIcon || _isAddToHomeMode)
+              IconButton(
+                icon: const Icon(Icons.cancel,
+                    color: Color.fromARGB(255, 255, 255, 255)),
+                onPressed: _resetToNormalMode,
+              )
+            else if (_showDeleteIcon)
+              IconButton(
+                icon: const Icon(Icons.check_box_outlined),
+                onPressed: _toggleSelectMode,
+              ),
+          ],
+          backgroundColor: Colors
+              .transparent, // Set to transparent because gradient is applied to Container
+          elevation:
+              0, // Remove elevation as the gradient is handling the visual effect
+        ),
+      ),
     );
   }
+
+  // AppBar _buildAppBar() {
+  //   return AppBar(
+  //     title: const Text('Relay', style: TextStyle(fontSize: 24)),
+  //     actions: [
+  //       if (_showEditIcon || _isAddToHomeMode)
+  //         IconButton(
+  //           icon: const Icon(Icons.cancel),
+  //           onPressed: _resetToNormalMode,
+  //         )
+  //       else if (_showDeleteIcon)
+  //         IconButton(
+  //           icon: const Icon(Icons.check_box_outlined),
+  //           onPressed: _toggleSelectMode,
+  //         ),
+  //     ],
+  //     backgroundColor: Colors.blueAccent,
+  //   );
+  // }
 
   Widget _buildRelayList() {
     var screenWidth = MediaQuery.of(context).size.width;
