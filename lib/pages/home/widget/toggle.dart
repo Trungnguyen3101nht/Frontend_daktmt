@@ -5,17 +5,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class Relay {
-  int id;
-  String name;
-  bool isOn;
+  final int id;
+  final String name;
+  final bool isOn;
 
   Relay({required this.id, required this.name, this.isOn = false});
 
-  // fromJson method for JSON parsing
   factory Relay.fromJson(Map<String, dynamic> json) {
     return Relay(
-      id: json['relay_id'] ?? 'NULL',
-      name: json['relay_name'] ?? 'NULL',
+      id: json['relay_id'] ?? 0,
+      name: json['relay_name'] ?? 'Unnamed Relay',
       isOn: json['state'] ?? false,
     );
   }
@@ -44,7 +43,6 @@ class _ToggleState extends State<toggle> {
   void initState() {
     super.initState();
     fetchHomeRelays();
-    print(homeRelays);
   }
 
   Future<void> fetchHomeRelays() async {
@@ -94,33 +92,37 @@ class _ToggleState extends State<toggle> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.toggleWidth,
-      height: widget.toggleHeight,
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: widget.numOfRelay,
-          crossAxisSpacing: 10.0,
-          mainAxisSpacing: 5.0,
+    if (homeRelays.isEmpty) {
+      return const Center(child: Text("No relays available"));
+    }
+
+    return Center(
+      child: SizedBox(
+        width: widget.toggleWidth,
+        height: widget.toggleHeight,
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10.0, // Horizontal spacing between widgets
+          runSpacing: 10.0, // Vertical spacing between widgets
+          children: List.generate(homeRelays.length, (index) {
+            return SizedBox(
+              width: widget.toggleWidth / widget.numOfRelay - 10,
+              height: 100.0,
+              child: OnOffSwitch(
+                label: homeRelays[index].name,
+                state: homeRelays[index].isOn,
+              ),
+            );
+          }),
         ),
-        itemCount: homeRelays.length,
-        itemBuilder: (context, index) {
-          return OnOffSwitch(
-            label: homeRelays[index].name,
-            state: homeRelays[index].isOn,
-          );
-        },
       ),
     );
   }
 }
 
-// Custom On/Off Switch Widget
 class OnOffSwitch extends StatelessWidget {
-  final String label; // Label for each relay
-  final bool state; // On/Off state
+  final String label;
+  final bool state;
 
   const OnOffSwitch({super.key, required this.label, required this.state});
 
@@ -128,30 +130,40 @@ class OnOffSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            Color.fromARGB(255, 214, 220, 231),
+            Color.fromARGB(255, 165, 164, 234),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
         border: Border.all(
-          color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.3),
+          color: const Color.fromARGB(255, 49, 60, 178).withOpacity(0.5),
           width: 2.0,
         ),
-        color: const Color.fromARGB(255, 252, 251, 251),
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            label, // Display label
+            label,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16.0,
+              fontSize: 20.0,
+              color: Color.fromARGB(255, 42, 5, 113),
             ),
+            overflow:
+                TextOverflow.ellipsis, // Adds "..." if the text is too long
+            maxLines: 1, // Limits to a single line
+            softWrap: false, // Prevents wrapping to a new line
           ),
           const SizedBox(height: 2),
           Text(
-            state ? 'On' : 'Off', // Display On/Off state
+            state ? 'On' : 'Off',
             style: TextStyle(
-              color: state
-                  ? const Color.fromARGB(255, 46, 163, 0)
-                  : const Color.fromARGB(255, 254, 2, 2), // Color for On/Off
+              color: state ? Colors.green : Colors.red,
               fontWeight: FontWeight.bold,
               fontSize: 18.0,
             ),

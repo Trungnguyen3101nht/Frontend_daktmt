@@ -33,7 +33,7 @@ class Schedule {
   }
 }
 
-const bool _isHovered = false; // To detect hover
+// const bool _isHovered = false; // To detect hover
 const bool _isTapped = false; // To detect tap (for mobile)
 int? _hoveredIndex;
 
