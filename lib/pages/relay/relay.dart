@@ -38,6 +38,8 @@ class _RelayScreenState extends State<RelayScreen> {
   bool _idError = false;
   String _errorMessage = '';
 
+  bool flatToggleSelect = false;
+
   bool _selectMode = false;
   List<bool> _isSelected = [];
 
@@ -181,11 +183,12 @@ class _RelayScreenState extends State<RelayScreen> {
               isOn: relay['state'], // Use 'state' for relay status
             );
           }).toList();
-
-          setState(() {
-            relays = fetchedRelays; // Update UI with fetched relays
-            _isSelected = List.generate(relays.length, (index) => false);
-          });
+          if (mounted) {
+            setState(() {
+              relays = fetchedRelays; // Update UI with fetched relays
+              _isSelected = List.generate(relays.length, (index) => false);
+            });
+          }
         } else {
           // If it's not a list, handle it accordingly (e.g., no data)
           setState(() {
@@ -307,7 +310,7 @@ class _RelayScreenState extends State<RelayScreen> {
     final prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('accessToken')!;
     final baseUrl = dotenv.env['API_BASE_URL']!;
-    final url = Uri.parse('http://$baseUrl/login');
+    final url = Uri.parse('http://$baseUrl/relay/delete');
     try {
       Map<String, dynamic> requestBody = {
         'relayId': relayId,
@@ -323,8 +326,10 @@ class _RelayScreenState extends State<RelayScreen> {
       );
 
       if (response.statusCode == 200) {
-        logger.i("Relay deleted successfully");
-        await fetchRelaysAPI(); // Refresh the list after deletion
+        // logger.i("Relay deleted successfully");
+        if (mounted) {
+          await fetchRelaysAPI(); // Refresh the list after deletion
+        }
       } else {
         logger.w("Failed to delete relay: ${response.body}");
       }
@@ -428,48 +433,56 @@ class _RelayScreenState extends State<RelayScreen> {
     );
   }
 
-  // Xóa relay với xác nhận
-  void _deleteRelay(int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete'),
-          content: const Text('Are you sure you want to delete this relay?'),
-          actions: [
-            ElevatedButton(
-              onPressed: () async {
-                String relayId = relays[index].id;
-                await deleteRelayAPI(relayId); // Call the API to delete
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-              ),
-              child: const Text('Yes'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey,
-              ),
-              child: const Text('No'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // Delete relays
+  // void _deleteRelay(int index) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: const Text('Delete'),
+  //         content: const Text('Are you sure you want to delete this relay?'),
+  //         actions: [
+  //           ElevatedButton(
+  //             onPressed: () async {
+  //               String relayId = relays[index].id;
+  //               await deleteRelayAPI(relayId); // Call the API to delete
+  //               // ignore: use_build_context_synchronously
+  //               Navigator.of(context).pop();
+  //             },
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: Colors.redAccent,
+  //             ),
+  //             child: const Text('Yes'),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: Colors.grey,
+  //             ),
+  //             child: const Text('No'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   void _toggleSelectMode() {
     setState(() {
+      // _isAddToHomeMode = false;
+      // _selectMode = !_selectMode;
+      flatToggleSelect = !flatToggleSelect;
+      _isSelected = List.generate(relays.length, (_) => flatToggleSelect);
+    });
+  }
+
+  void _toggleDeleteMode() {
+    setState(() {
+      _showDeleteIcon = !_showDeleteIcon;
       _isAddToHomeMode = false;
-      _selectMode = !_selectMode;
       _isSelected = List.generate(relays.length, (_) => false);
-      // _isActiveButtonEnabled = false;
     });
   }
 
@@ -484,6 +497,31 @@ class _RelayScreenState extends State<RelayScreen> {
         (index) => homeRelays.contains(relays[index]),
       );
     });
+  }
+
+  void _confirmDeleteRelays() async {
+    List<Relay> selectedRelaysDelete = [];
+    for (int i = 0; i < relays.length; i++) {
+      if (_isSelected[i]) {
+        selectedRelaysDelete.add(relays[i]);
+      }
+    }
+    int numDeletedRelay = 0;
+    for (var relay in selectedRelaysDelete) {
+      String relayId = relay.id;
+      await deleteRelayAPI(relayId);
+      // selectedRelaysDelete.remove(relay);
+      numDeletedRelay++;
+    }
+    if (numDeletedRelay <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("$numDeletedRelay relay deleted")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("$numDeletedRelay relays deleted")),
+      );
+    }
   }
 
   void _confirmAddToHome() async {
@@ -664,11 +702,6 @@ class _RelayScreenState extends State<RelayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var screenWidth = MediaQuery.of(context).size.width;
-
-    int crossAxisCount = screenWidth > 600 ? 2 : 1;
-    double childAspectRatio = screenWidth > 600 ? 6.0 : 4.0;
-
     return Scaffold(
       drawer: const Navbar_left(),
       appBar: _buildAppBar(),
@@ -683,6 +716,17 @@ class _RelayScreenState extends State<RelayScreen> {
                 onPressed: _confirmAddToHome,
                 label: const Text('Add to home'),
                 icon: const Icon(Icons.home_work_sharp),
+                backgroundColor: Colors.blueAccent,
+              ),
+            )
+          else if (_showDeleteIcon)
+            Positioned(
+              bottom: 20,
+              left: 20,
+              child: FloatingActionButton.extended(
+                onPressed: _confirmDeleteRelays,
+                label: const Text('Delete'),
+                icon: const Icon(Icons.delete_sharp),
                 backgroundColor: Colors.blueAccent,
               ),
             ),
@@ -702,76 +746,24 @@ class _RelayScreenState extends State<RelayScreen> {
     });
   }
 
-  // PreferredSize _buildAppBar() {
-  //   return PreferredSize(
-  //     preferredSize: const Size.fromHeight(kToolbarHeight), // Set AppBar height
-  //     child: Container(
-  //       decoration: const BoxDecoration(
-  //         gradient: LinearGradient(
-  //           colors: [
-  //             Color.fromARGB(255, 106, 197, 224),
-  //             Color.fromARGB(255, 10, 117, 232)
-  //           ], // Gradient colors
-  //           begin: Alignment.topLeft, // Start point of the gradient
-  //           end: Alignment.bottomRight, // End point of the gradient
-  //         ),
-  //       ),
-  //       child: AppBar(
-  //         title: const Text(
-  //           'Schedule',
-  //           style: TextStyle(
-  //             fontSize: 24, // Set the font size
-  //             fontWeight: FontWeight.w600, // Semi-bold font weight
-  //             color: Colors.white, // Text color
-  //             letterSpacing: 1.2, // Letter spacing for readability
-  //             fontFamily: 'avenir', // Use a custom font family (optional)
-  //           ),
-  //         ),
-  //         centerTitle: true,
-  //         actions: [
-  //           if (_showDeleteIcon || _showEditIcon || _isAddToHomeMode)
-  //             IconButton(
-  //               icon: const Icon(Icons.cancel),
-  //               onPressed: _resetToNormalMode,
-  //             ),
-  //         ],
-  //         backgroundColor: Colors
-  //             .transparent, // Set to transparent because gradient is applied to Container
-  //         elevation:
-  //             0, // Remove elevation as the gradient is handling the visual effect
-  //       ),
-  //     ),
-  //   );
-  // }
-
   AppBar _buildAppBar() {
     return AppBar(
       title: const Text('Relay', style: TextStyle(fontSize: 24)),
       actions: [
-        if (_showDeleteIcon || _showEditIcon || _isAddToHomeMode)
+        if (_showEditIcon || _isAddToHomeMode)
           IconButton(
             icon: const Icon(Icons.cancel),
             onPressed: _resetToNormalMode,
+          )
+        else if (_showDeleteIcon)
+          IconButton(
+            icon: const Icon(Icons.check_box_outlined),
+            onPressed: _toggleSelectMode,
           ),
       ],
       backgroundColor: Colors.blueAccent,
     );
   }
-
-  // GridView _buildGridView(int crossAxisCount, double childAspectRatio) {
-  //   return GridView.builder(
-  //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-  //       crossAxisCount: crossAxisCount,
-  //       crossAxisSpacing: 8.0,
-  //       mainAxisSpacing: 8.0,
-  //       childAspectRatio: childAspectRatio,
-  //     ),
-  //     itemCount: relays.length,
-  //     itemBuilder: (context, index) {
-  //       return _buildRelayCard(index);
-  //     },
-  //   );
-  // }
 
   Widget _buildRelayList() {
     var screenWidth = MediaQuery.of(context).size.width;
@@ -790,32 +782,96 @@ class _RelayScreenState extends State<RelayScreen> {
                     ? 4.5
                     : 4.0;
 
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(), // Bouncing scroll effect
-      slivers: [
-        SliverGrid(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return _buildRelayCard(index); // Build each schedule card
-            },
-            childCount: relays.length,
-          ),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount:
-                crossAxisCount, // Number of columns based on screen width
-            crossAxisSpacing: 8.0, // Horizontal space between items
-            mainAxisSpacing: 8.0, // Vertical space between items
-            childAspectRatio: childAspectRatio, // Aspect ratio of each card
-          ),
-        ),
-        // Add extra padding at the bottom (same as before)
-        const SliverPadding(
-          padding:
-              EdgeInsets.only(bottom: 200), // Adjust based on your card height
-        ),
-      ],
-    );
+    return relays.isEmpty
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'No relays added yet.',
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _addRelay,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                  ),
+                  child: const Text('Add Relay'),
+                ),
+              ],
+            ),
+          )
+        : CustomScrollView(
+            physics: const BouncingScrollPhysics(), // Bouncing scroll effect
+            slivers: [
+              SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return _buildRelayCard(index); // Build each relay card
+                  },
+                  childCount: relays.length,
+                ),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount:
+                      crossAxisCount, // Number of columns based on screen width
+                  crossAxisSpacing: 8.0, // Horizontal space between items
+                  mainAxisSpacing: 8.0, // Vertical space between items
+                  childAspectRatio:
+                      childAspectRatio, // Aspect ratio of each card
+                ),
+              ),
+              // Add extra padding at the bottom (same as before)
+              const SliverPadding(
+                padding: EdgeInsets.only(bottom: 200),
+              ),
+            ],
+          );
   }
+
+  // Widget _buildRelayList() {
+  //   var screenWidth = MediaQuery.of(context).size.width;
+
+  //   // Determine number of columns based on screen width
+  //   int crossAxisCount = screenWidth > 800 ? 2 : 1;
+
+  //   // Calculate childAspectRatio for different screen sizes (optional)
+  //   double childAspectRatio = screenWidth > 1350
+  //       ? 7.0
+  //       : screenWidth > 1150
+  //           ? 6.5
+  //           : screenWidth > 950
+  //               ? 5.5
+  //               : screenWidth > 800
+  //                   ? 4.5
+  //                   : 4.0;
+
+  //   return CustomScrollView(
+  //     physics: const BouncingScrollPhysics(), // Bouncing scroll effect
+  //     slivers: [
+  //       SliverGrid(
+  //         delegate: SliverChildBuilderDelegate(
+  //           (context, index) {
+  //             return _buildRelayCard(index); // Build each schedule card
+  //           },
+  //           childCount: relays.length,
+  //         ),
+  //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //           crossAxisCount:
+  //               crossAxisCount, // Number of columns based on screen width
+  //           crossAxisSpacing: 8.0, // Horizontal space between items
+  //           mainAxisSpacing: 8.0, // Vertical space between items
+  //           childAspectRatio: childAspectRatio, // Aspect ratio of each card
+  //         ),
+  //       ),
+  //       // Add extra padding at the bottom (same as before)
+  //       const SliverPadding(
+  //         padding:
+  //             EdgeInsets.only(bottom: 200), // Adjust based on your card height
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildRelayCard(int index) {
     bool isAlreadyAddedToHome = homeRelays.contains(relays[index]);
@@ -826,8 +882,13 @@ class _RelayScreenState extends State<RelayScreen> {
 
     return GestureDetector(
       onTap: () {
-        // Call _editSchedule function when the card is tapped
-        _editRelay(index);
+        if (_showDeleteIcon || _isAddToHomeMode) {
+          setState(() {
+            _isSelected[index] = !_isSelected[index];
+          });
+        } else {
+          _editRelay(index);
+        }
       },
       child: MouseRegion(
         onEnter: (_) {
@@ -890,24 +951,13 @@ class _RelayScreenState extends State<RelayScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // First Column: Icon or Checkbox
-                        _selectMode
-                            ? Checkbox(
-                                value: _isSelected[index],
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isSelected[index] = value!;
-                                  });
-                                },
-                              )
-                            : Icon(
-                                isAlreadyAddedToHome
-                                    ? Icons
-                                        .home_work_sharp // Icon if already added
-                                    : Icons.electrical_services_rounded,
-                                color: const Color.fromARGB(255, 255, 255, 255),
-                                size: 30,
-                              ),
+                        Icon(
+                          isAlreadyAddedToHome
+                              ? Icons.home_work_sharp // Icon if already added
+                              : Icons.electrical_services_rounded,
+                          color: const Color.fromARGB(255, 255, 255, 255),
+                          size: 30,
+                        ),
                         const SizedBox(
                             width:
                                 8), // Space between icon/checkbox and next column
@@ -985,11 +1035,20 @@ class _RelayScreenState extends State<RelayScreen> {
               },
             ),
           if (_showDeleteIcon)
-            IconButton(
-              icon: const Icon(Icons.delete,
-                  color: Color.fromARGB(255, 237, 230, 230)),
-              onPressed: () => _deleteRelay(index),
+            Checkbox(
+              value: isSelected, // Reflect current selection state
+              onChanged: (bool? value) {
+                setState(() {
+                  _isSelected[index] =
+                      value ?? false; // Allow toggling for all relays
+                });
+              },
             ),
+          // IconButton(
+          //   icon: const Icon(Icons.delete,
+          //       color: Color.fromARGB(255, 237, 230, 230)),
+          //   onPressed: () => _deleteRelay(index),
+          // ),
           if (!_showDeleteIcon &&
               !_isAddToHomeMode &&
               !_showEditIcon) // Don't show Switch in delete, select, and adHome mode
@@ -1037,10 +1096,11 @@ class _RelayScreenState extends State<RelayScreen> {
           ),
           onTap: () {
             setState(() {
-              _showDeleteIcon = true;
+              // _showDeleteIcon = true;
               _showEditIcon = false;
               _isAddToHomeMode = false;
               _selectMode = false;
+              _toggleDeleteMode();
             });
           },
         ),

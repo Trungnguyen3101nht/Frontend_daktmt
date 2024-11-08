@@ -77,6 +77,7 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final bool _isHovered = false; // To detect hover
   final bool _isTapped = false; // To detect tap (for mobile)
+  bool flatToggleSelect = false;
   int? _hoveredIndex;
   final TextEditingController _nameController = TextEditingController();
   final List<String> _days = [
@@ -1090,6 +1091,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     });
   }
 
+  void _toggleSelectMode() {
+    setState(() {
+      // _isAddToHomeMode = false;
+      // _selectMode = !_selectMode;
+      flatToggleSelect = !flatToggleSelect;
+      _isSelected = List.generate(schedules.length, (_) => flatToggleSelect);
+    });
+  }
+
   void _resetToNormalMode() {
     setState(() {
       _showDeleteIcon = false;
@@ -1201,38 +1211,29 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
   }
 
-  void _deleteSchedule(int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete'),
-          content: const Text('Are you sure you want to delete this Schedule?'),
-          actions: [
-            ElevatedButton(
-              onPressed: () async {
-                String scheduleId = schedules[index].id;
-                await deleteScheduleAPI(scheduleId); // Call the API to delete
-                Navigator.of(context).pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-              ),
-              child: const Text('Yes'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey,
-              ),
-              child: const Text('No'),
-            ),
-          ],
-        );
-      },
-    );
+  void _confirmDeleteRelays() async {
+    List<Schedule> selectedSchedulesDelete = [];
+    for (int i = 0; i < schedules.length; i++) {
+      if (_isSelected[i]) {
+        selectedSchedulesDelete.add(schedules[i]);
+      }
+    }
+    int numDeletedSchedules = 0;
+    for (var Schedule in selectedSchedulesDelete) {
+      String scheduleId = Schedule.id;
+      await deleteScheduleAPI(scheduleId);
+      // selectedRelaysDelete.remove(relay);
+      numDeletedSchedules++;
+    }
+    if (numDeletedSchedules <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("$numDeletedSchedules schedule deleted")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("$numDeletedSchedules schedules deleted")),
+      );
+    }
   }
 
   Widget _buildSpeedDial() {
@@ -1301,31 +1302,53 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     ? 4.5
                     : 4.0;
 
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(), // Bouncing scroll effect
-      slivers: [
-        SliverGrid(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return _buildScheduleCard(index); // Build each schedule card
-            },
-            childCount: schedules.length,
-          ),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount:
-                crossAxisCount, // Number of columns based on screen width
-            crossAxisSpacing: 8.0, // Horizontal space between items
-            mainAxisSpacing: 8.0, // Vertical space between items
-            childAspectRatio: childAspectRatio, // Aspect ratio of each card
-          ),
-        ),
-        // Add extra padding at the bottom (same as before)
-        const SliverPadding(
-          padding:
-              EdgeInsets.only(bottom: 200), // Adjust based on your card height
-        ),
-      ],
-    );
+    return schedules.isEmpty
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'No schedules added yet.',
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _addSchedule,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                  ),
+                  child: const Text('Add Schedule'),
+                ),
+              ],
+            ),
+          )
+        : CustomScrollView(
+            physics: const BouncingScrollPhysics(), // Bouncing scroll effect
+            slivers: [
+              SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return _buildScheduleCard(
+                        index); // Build each schedule card
+                  },
+                  childCount: schedules.length,
+                ),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount:
+                      crossAxisCount, // Number of columns based on screen width
+                  crossAxisSpacing: 8.0, // Horizontal space between items
+                  mainAxisSpacing: 8.0, // Vertical space between items
+                  childAspectRatio:
+                      childAspectRatio, // Aspect ratio of each card
+                ),
+              ),
+              // Add extra padding at the bottom (same as before)
+              const SliverPadding(
+                padding: EdgeInsets.only(
+                    bottom: 200), // Adjust based on your card height
+              ),
+            ],
+          );
   }
 
   PreferredSize _buildAppBar() {
@@ -1355,10 +1378,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
           centerTitle: true,
           actions: [
-            if (_showDeleteIcon || _showEditIcon)
+            if (_showEditIcon)
               IconButton(
                 icon: const Icon(Icons.cancel),
                 onPressed: _resetToNormalMode,
+              )
+            else if (_showDeleteIcon)
+              IconButton(
+                icon: const Icon(Icons.check_box_outlined),
+                onPressed: _toggleSelectMode,
               ),
           ],
           backgroundColor: Colors
@@ -1391,6 +1419,17 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: Stack(
           children: [
             _buildScheduleList(),
+            if (_showDeleteIcon)
+              Positioned(
+                bottom: 20,
+                left: 20,
+                child: FloatingActionButton.extended(
+                  onPressed: _confirmDeleteRelays,
+                  label: const Text('Delete'),
+                  icon: const Icon(Icons.delete_sharp),
+                  backgroundColor: Colors.blueAccent,
+                ),
+              ),
             // _buildGridView(crossAxisCount, childAspectRatio),
           ],
         ),
@@ -1406,14 +1445,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             255, 187, 176, 176); // Inactive state (gray color)
 
     return GestureDetector(
-      // onTap: () {
-      //   setState(() {
-      //     _isTapped = !_isTapped; // Toggle the tapped state
-      //   });
-      // },
       onTap: () {
-        // Call _editSchedule function when the card is tapped
-        _editSchedule(index);
+        if (_showDeleteIcon) {
+          setState(() {
+            _isSelected[index] = !_isSelected[index];
+          });
+        } else {
+          _editSchedule(index);
+        }
       },
       child: MouseRegion(
         onEnter: (_) {
@@ -1548,6 +1587,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Center _buildScheduleTrailingActions(int index) {
+    bool isSelected = _isSelected[index];
     return Center(
       // Center the Row
       child: Row(
@@ -1555,10 +1595,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         crossAxisAlignment: CrossAxisAlignment.center, // Center vertically
         children: [
           if (_showDeleteIcon)
-            IconButton(
-              icon: const Icon(Icons.delete,
-                  color: Color.fromARGB(255, 237, 230, 230)),
-              onPressed: () => _deleteSchedule(index),
+            Checkbox(
+              value: isSelected, // Reflect current selection state
+              onChanged: (bool? value) {
+                setState(() {
+                  _isSelected[index] =
+                      value ?? false; // Allow toggling for all relays
+                });
+              },
             ),
           if (!_showDeleteIcon &&
               !_showEditIcon) // Don't show Switch in delete, select, and adHome mode
@@ -1650,3 +1694,68 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 }
+
+
+  // Widget _buildRelayList() {
+  //   var screenWidth = MediaQuery.of(context).size.width;
+
+  //   // Determine number of columns based on screen width
+  //   int crossAxisCount = screenWidth > 800 ? 2 : 1;
+
+  //   // Calculate childAspectRatio for different screen sizes (optional)
+  //   double childAspectRatio = screenWidth > 1350
+  //       ? 7.0
+  //       : screenWidth > 1150
+  //           ? 6.5
+  //           : screenWidth > 950
+  //               ? 5.5
+  //               : screenWidth > 800
+  //                   ? 4.5
+  //                   : 4.0;
+
+  //   return relays.isEmpty
+  //       ? Center(
+  //           child: Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               const Text(
+  //                 'No relays added yet.',
+  //                 style: TextStyle(fontSize: 18, color: Colors.grey),
+  //               ),
+  //               const SizedBox(height: 20),
+  //               ElevatedButton(
+  //                 onPressed: _addRelay,
+  //                 style: ElevatedButton.styleFrom(
+  //                   backgroundColor: Colors.blueAccent,
+  //                 ),
+  //                 child: const Text('Add Relay'),
+  //               ),
+  //             ],
+  //           ),
+  //         )
+  //       : CustomScrollView(
+  //           physics: const BouncingScrollPhysics(), // Bouncing scroll effect
+  //           slivers: [
+  //             SliverGrid(
+  //               delegate: SliverChildBuilderDelegate(
+  //                 (context, index) {
+  //                   return _buildRelayCard(index); // Build each relay card
+  //                 },
+  //                 childCount: relays.length,
+  //               ),
+  //               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //                 crossAxisCount:
+  //                     crossAxisCount, // Number of columns based on screen width
+  //                 crossAxisSpacing: 8.0, // Horizontal space between items
+  //                 mainAxisSpacing: 8.0, // Vertical space between items
+  //                 childAspectRatio:
+  //                     childAspectRatio, // Aspect ratio of each card
+  //               ),
+  //             ),
+  //             // Add extra padding at the bottom (same as before)
+  //             const SliverPadding(
+  //               padding: EdgeInsets.only(bottom: 200),
+  //             ),
+  //           ],
+  //         );
+  // }
