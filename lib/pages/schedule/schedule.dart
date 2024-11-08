@@ -970,36 +970,114 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Select Relays:"),
+        const Text(
+          "Select desired relay states:",
+          style: TextStyle(
+            fontSize: 15, // Set the font size
+            fontWeight: FontWeight.w600, // Semi-bold font weight
+            color: Color.fromARGB(255, 80, 73, 73), // Text color
+            letterSpacing: 1.2, // Letter spacing for readability
+            fontFamily: 'avenir', // Use a custom font family (optional)
+          ),
+        ),
         ...relays.asMap().entries.map((entry) {
           int index = entry.key;
           var relay = entry.value;
-          return ListTile(
-            leading: Checkbox(
-              value: _isSelectedRelays[index],
-              onChanged: (value) {
+
+          // Define the background color based on relay selection
+          Color backgroundColor = _isSelectedRelays[index]
+              ? const Color.fromARGB(255, 5, 74, 131)
+              : const Color.fromARGB(255, 207, 202, 202);
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 6.0,
+              horizontal: 8.0,
+            ), // Add vertical and horizontal padding
+            child: GestureDetector(
+              onTap: () {
                 setState(() {
-                  _isSelectedRelays[index] = value!;
+                  // Toggle selection state when the entire item is tapped
+                  _isSelectedRelays[index] = !_isSelectedRelays[index];
                 });
               },
-            ),
-            title: Text(relay.name),
-            subtitle:
-                Text("Current state: ${relay.isSetChedule ? "ON" : "OFF"}"),
-            trailing: Switch(
-              value: relays[index].isSetChedule,
-              activeColor: Colors.green,
-              onChanged: (bool value) async {
-                setState(() {
-                  relays[index].isSetChedule = value;
-                });
-              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: backgroundColor, // Set background color dynamically
+                  borderRadius: BorderRadius.circular(12), // Rounded corners
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 10.0,
+                  ), // Padding inside the ListTile
+                  title: Text(
+                    relay.name,
+                    style: const TextStyle(
+                      fontSize: 15, // Set the font size
+                      fontWeight: FontWeight.w600, // Semi-bold font weight
+                      color: Color.fromARGB(255, 251, 251, 251), // Text color
+                      letterSpacing: 1.2, // Letter spacing for readability
+                      fontFamily:
+                          'avenir', // Use a custom font family (optional)
+                    ),
+                  ),
+                  trailing: Switch(
+                    value: relay.isSetChedule,
+                    activeTrackColor: Colors
+                        .blue, // Custom color for the active track (background)
+                    inactiveThumbColor: const Color.fromARGB(255, 222, 213,
+                        213), // Custom color for the "off" thumb (circle)
+                    inactiveTrackColor: const Color.fromARGB(255, 235, 232,
+                        232), // Custom color for the "off" track (background)
+                    onChanged: (bool value) {
+                      setState(() {
+                        relay.isSetChedule = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
             ),
           );
         }),
       ],
     );
   }
+
+  // Widget _buildRelaysSelection(StateSetter setState) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text("Select Relays:"),
+  //       ...relays.asMap().entries.map((entry) {
+  //         int index = entry.key;
+  //         var relay = entry.value;
+  //         return ListTile(
+  //           leading: Checkbox(
+  //             value: _isSelectedRelays[index],
+  //             onChanged: (value) {
+  //               setState(() {
+  //                 _isSelectedRelays[index] = value!;
+  //               });
+  //             },
+  //           ),
+  //           title: Text(relay.name),
+  //           subtitle:
+  //               Text("Current state: ${relay.isSetChedule ? "ON" : "OFF"}"),
+  //           trailing: Switch(
+  //             value: relays[index].isSetChedule,
+  //             activeColor: Colors.green,
+  //             onChanged: (bool value) async {
+  //               setState(() {
+  //                 relays[index].isSetChedule = value;
+  //               });
+  //             },
+  //           ),
+  //         );
+  //       }),
+  //     ],
+  //   );
+  // }
 
   List<Widget> _buildDialogActions(StateSetter setState) {
     return [
