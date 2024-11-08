@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_daktmt/nav_bar/nav_bar_left.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:math' as math;
+// import 'dart:math' as math;
 
 class Relay {
   String id;
@@ -75,7 +75,7 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  final bool _isHovered = false; // To detect hover
+  // final bool _isHovered = false; // To detect hover
   final bool _isTapped = false; // To detect tap (for mobile)
   bool flatToggleSelect = false;
   int? _hoveredIndex;
@@ -99,7 +99,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   bool _showDeleteIcon = false;
   bool _showEditIcon = false;
-  bool _selectMode = false;
+  // final bool _selectMode = false;
   List<bool> _isSelected = []; // Schedules is selected
   List<bool> _isSelectedRelays =
       []; // Check whether the relay is checked or not bruh
@@ -1104,7 +1104,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     setState(() {
       _showDeleteIcon = false;
       _showEditIcon = false;
-      _selectMode = false;
+      // _selectMode = false;
     });
   }
 
@@ -1259,7 +1259,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             setState(() {
               _showDeleteIcon = true;
               _showEditIcon = false;
-              _selectMode = false;
+              // _selectMode = false;
             });
           },
         ),
@@ -1272,7 +1272,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             setState(() {
               _toggleShowEditIcon();
               _showDeleteIcon = false;
-              _selectMode = false;
+              // _selectMode = false;
             });
           },
         ),
@@ -1515,19 +1515,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // First Column: Icon or Checkbox
-                        _selectMode
-                            ? Checkbox(
-                                value: _isSelected[index],
-                                onChanged: (value) {
-                                  setState(() => _isSelected[index] = value!);
-                                },
-                              )
-                            : const Icon(
-                                Icons.timer_rounded,
-                                color: Colors.white,
-                                size: 30,
-                              ),
+                        const Icon(
+                          Icons.timer_rounded,
+                          color: Colors.white,
+                          size: 30,
+                        ),
                         const SizedBox(
                             width:
                                 8), // Space between icon/checkbox and next column

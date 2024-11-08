@@ -26,7 +26,7 @@ class RelayScreen extends StatefulWidget {
 }
 
 class _RelayScreenState extends State<RelayScreen> {
-  final bool _isHovered = false; // To detect hover
+  // final bool _isHovered = false; // To detect hover
   final bool _isTapped = false; // To detect tap (for mobile)
   int? _hoveredIndex;
   List<Relay> relays = [];
@@ -40,7 +40,7 @@ class _RelayScreenState extends State<RelayScreen> {
 
   bool flatToggleSelect = false;
 
-  bool _selectMode = false;
+  // bool _selectMode = false;
   List<bool> _isSelected = [];
 
   bool _showDeleteIcon = false;
@@ -489,7 +489,7 @@ class _RelayScreenState extends State<RelayScreen> {
   void _toggleAddToHomeMode() {
     setState(() {
       _isAddToHomeMode = !_isAddToHomeMode;
-      _selectMode = false;
+      // _selectMode = false;
 
       // Initialize _isSelected based on homeRelays, allowing toggle of each selection
       _isSelected = List.generate(
@@ -594,9 +594,9 @@ class _RelayScreenState extends State<RelayScreen> {
       );
     }
 
-    setState(() {
-      _selectMode = false; // Disable selection mode
-    });
+    // setState(() {
+    //   _selectMode = false; // Disable selection mode
+    // });
   }
 
   void _editRelay(int index) {
@@ -741,7 +741,7 @@ class _RelayScreenState extends State<RelayScreen> {
     setState(() {
       _showDeleteIcon = false;
       _showEditIcon = false;
-      _selectMode = false;
+      // _selectMode = false;
       _isAddToHomeMode = false;
     });
   }
@@ -1099,7 +1099,7 @@ class _RelayScreenState extends State<RelayScreen> {
               // _showDeleteIcon = true;
               _showEditIcon = false;
               _isAddToHomeMode = false;
-              _selectMode = false;
+              // _selectMode = false;
               _toggleDeleteMode();
             });
           },
@@ -1127,7 +1127,7 @@ class _RelayScreenState extends State<RelayScreen> {
               _isAddToHomeMode = false;
               _showEditIcon = true;
               _showDeleteIcon = false;
-              _selectMode = false;
+              // _selectMode = false;
             });
           },
         ),
