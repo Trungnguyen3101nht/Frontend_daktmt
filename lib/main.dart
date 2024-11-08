@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:frontend_daktmt/pages/history/history.dart';
 import 'package:frontend_daktmt/pages/home/home.dart';
@@ -12,7 +11,7 @@ import 'package:frontend_daktmt/pages/setting/setting.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
-  await dotenv.load(); 
+  await dotenv.load();
   runApp(const MyApp());
 }
 
@@ -29,7 +28,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-         '/': (context) => const SignIn(),
+        '/': (context) => const SignIn(),
         '/signin': (context) => const SignIn(),
         '/home': (context) => const HomeScreen(),
         '/register': (context) => const Register(),

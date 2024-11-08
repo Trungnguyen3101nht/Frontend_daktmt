@@ -310,7 +310,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
     // Set time
     selectedTime = parseTimeString(schedules[index].time);
-
     for (int i = 0; i < relays.length; i++) {
       Action? relayAction = schedules[index].actions.firstWhere(
             (action) => action.relayId == int.tryParse(relays[i].id),
@@ -323,7 +322,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           .actions
           .any((action) => action.relayId == int.tryParse(relays[i].id));
     }
-
     showDialog(
       context: context,
       builder: (context) {
@@ -550,24 +548,42 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildNewRelaysSelection(StateSetter setState) {
+    if (relays.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            "Relays are not available.",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           "Select desired relay states:",
           style: TextStyle(
-            fontSize: 15, // Set the font size
-            fontWeight: FontWeight.w600, // Semi-bold font weight
-            color: Color.fromARGB(255, 80, 73, 73), // Text color
-            letterSpacing: 1.2, // Letter spacing for readability
-            fontFamily: 'avenir', // Use a custom font family (optional)
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: Color.fromARGB(255, 80, 73, 73),
+            letterSpacing: 1.2,
+            fontFamily: 'avenir',
           ),
         ),
+        const SizedBox(height: 8),
         ...relays.asMap().entries.map((entry) {
           int index = entry.key;
           var relay = entry.value;
 
-          // Define the background color based on relay selection
           Color backgroundColor = _isSelectedRelays[index]
               ? const Color.fromARGB(255, 5, 74, 131)
               : const Color.fromARGB(255, 207, 202, 202);
@@ -576,42 +592,37 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             padding: const EdgeInsets.symmetric(
               vertical: 6.0,
               horizontal: 8.0,
-            ), // Add vertical and horizontal padding
+            ),
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  // Toggle selection state when the entire item is tapped
                   _isSelectedRelays[index] = !_isSelectedRelays[index];
                 });
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: backgroundColor, // Set background color dynamically
-                  borderRadius: BorderRadius.circular(12), // Rounded corners
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                  ), // Padding inside the ListTile
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),
                   title: Text(
                     relay.name,
                     style: const TextStyle(
-                      fontSize: 15, // Set the font size
-                      fontWeight: FontWeight.w600, // Semi-bold font weight
-                      color: Color.fromARGB(255, 251, 251, 251), // Text color
-                      letterSpacing: 1.2, // Letter spacing for readability
-                      fontFamily:
-                          'avenir', // Use a custom font family (optional)
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color.fromARGB(255, 251, 251, 251),
+                      letterSpacing: 1.2,
+                      fontFamily: 'avenir',
                     ),
                   ),
                   trailing: Switch(
                     value: relay.isSetChedule,
-                    activeTrackColor: Colors
-                        .blue, // Custom color for the active track (background)
-                    inactiveThumbColor: const Color.fromARGB(255, 222, 213,
-                        213), // Custom color for the "off" thumb (circle)
-                    inactiveTrackColor: const Color.fromARGB(255, 235, 232,
-                        232), // Custom color for the "off" track (background)
+                    activeTrackColor: Colors.blue,
+                    inactiveThumbColor:
+                        const Color.fromARGB(255, 222, 213, 213),
+                    inactiveTrackColor:
+                        const Color.fromARGB(255, 235, 232, 232),
                     onChanged: (bool value) {
                       setState(() {
                         relay.isSetChedule = value;
@@ -670,7 +681,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           }
         },
         style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 93, 128, 187),
+            backgroundColor: const Color.fromARGB(255, 14, 83, 202),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
         child: const Text(
@@ -717,44 +728,69 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   Future<void> fetchRelaysAPI() async {
     final prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('accessToken')!;
-    final baseUrl = dotenv.env['API_BASE_URL']!;
+    var token = prefs.getString('accessToken');
+    if (token == null) {
+      print("Error: Access token not found.");
+      return;
+    }
+
+    final baseUrl = dotenv.env['API_BASE_URL'];
+    if (baseUrl == null) {
+      print("Error: API_BASE_URL not set in environment.");
+      return;
+    }
+
     final url = Uri.parse('http://$baseUrl/relay/get');
+
     try {
-      var response = await http.get(url, headers: {
-        'Authorization': 'Bearer $token', // Update with your token
-      });
+      var response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
 
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
 
-        // Check if responseData is a list, otherwise handle empty or unexpected response
-        if (responseData is List<dynamic>) {
+        // Check if responseData is a list
+        if (responseData is List<dynamic> && responseData.isNotEmpty) {
           List<Relay> fetchedRelays = responseData.map((relay) {
             return Relay(
-              id: relay['relay_id'].toString(), // Use 'relay_id'
+              id: relay['relay_id'].toString(),
               name: relay['relay_name'],
-              isOn: relay['state'], // Use 'state' for relay status
+              isOn: relay['state'],
             );
           }).toList();
 
           setState(() {
-            relays = fetchedRelays; // Update UI with fetched relays
-            _isSelectedRelays = List.generate(relays.length, (index) => false);
+            relays = fetchedRelays;
+            _isSelectedRelays = List.generate(
+                relays.length, (index) => false); // Update selection
           });
         } else {
-          // If it's not a list, handle it accordingly (e.g., no data)
+          // Handle empty or unexpected response
           setState(() {
-            relays = []; // Set relays to an empty list
-            _isSelected = [];
+            relays = [];
+            _isSelectedRelays = [];
           });
-          print("Unexpected response format: ${response.body}");
+          print("No relays available or unexpected response: ${response.body}");
         }
       } else {
+        // Handle non-200 responses
         print("Failed to fetch relays: ${response.body}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text("Error fetching relays: ${response.statusCode}")),
+        );
       }
     } catch (e) {
+      // Handle network or JSON decoding errors
       print("Error occurred: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("An error occurred while fetching relays.")),
+      );
     }
   }
 
@@ -967,24 +1003,42 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildRelaysSelection(StateSetter setState) {
+    if (relays.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            "Relays are not available.",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           "Select desired relay states:",
           style: TextStyle(
-            fontSize: 15, // Set the font size
-            fontWeight: FontWeight.w600, // Semi-bold font weight
-            color: Color.fromARGB(255, 80, 73, 73), // Text color
-            letterSpacing: 1.2, // Letter spacing for readability
-            fontFamily: 'avenir', // Use a custom font family (optional)
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: Color.fromARGB(255, 80, 73, 73),
+            letterSpacing: 1.2,
+            fontFamily: 'avenir',
           ),
         ),
+        const SizedBox(height: 8),
         ...relays.asMap().entries.map((entry) {
           int index = entry.key;
           var relay = entry.value;
 
-          // Define the background color based on relay selection
           Color backgroundColor = _isSelectedRelays[index]
               ? const Color.fromARGB(255, 5, 74, 131)
               : const Color.fromARGB(255, 207, 202, 202);
@@ -993,42 +1047,37 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             padding: const EdgeInsets.symmetric(
               vertical: 6.0,
               horizontal: 8.0,
-            ), // Add vertical and horizontal padding
+            ),
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  // Toggle selection state when the entire item is tapped
                   _isSelectedRelays[index] = !_isSelectedRelays[index];
                 });
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: backgroundColor, // Set background color dynamically
-                  borderRadius: BorderRadius.circular(12), // Rounded corners
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                  ), // Padding inside the ListTile
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),
                   title: Text(
                     relay.name,
                     style: const TextStyle(
-                      fontSize: 15, // Set the font size
-                      fontWeight: FontWeight.w600, // Semi-bold font weight
-                      color: Color.fromARGB(255, 251, 251, 251), // Text color
-                      letterSpacing: 1.2, // Letter spacing for readability
-                      fontFamily:
-                          'avenir', // Use a custom font family (optional)
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color.fromARGB(255, 251, 251, 251),
+                      letterSpacing: 1.2,
+                      fontFamily: 'avenir',
                     ),
                   ),
                   trailing: Switch(
                     value: relay.isSetChedule,
-                    activeTrackColor: Colors
-                        .blue, // Custom color for the active track (background)
-                    inactiveThumbColor: const Color.fromARGB(255, 222, 213,
-                        213), // Custom color for the "off" thumb (circle)
-                    inactiveTrackColor: const Color.fromARGB(255, 235, 232,
-                        232), // Custom color for the "off" track (background)
+                    activeTrackColor: Colors.blue,
+                    inactiveThumbColor:
+                        const Color.fromARGB(255, 222, 213, 213),
+                    inactiveTrackColor:
+                        const Color.fromARGB(255, 235, 232, 232),
                     onChanged: (bool value) {
                       setState(() {
                         relay.isSetChedule = value;
@@ -1289,7 +1338,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
   }
 
-  void _confirmDeleteRelays() async {
+  void _confirmDeleteSchedules() async {
     List<Schedule> selectedSchedulesDelete = [];
     for (int i = 0; i < schedules.length; i++) {
       if (_isSelected[i]) {
@@ -1300,7 +1349,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     for (var Schedule in selectedSchedulesDelete) {
       String scheduleId = Schedule.id;
       await deleteScheduleAPI(scheduleId);
-      // selectedRelaysDelete.remove(relay);
       numDeletedSchedules++;
     }
     if (numDeletedSchedules <= 1) {
@@ -1347,7 +1395,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             child: Icon(Icons.edit, color: Colors.blue),
           ),
           onTap: () {
-            setState(() {
+            setState(() async {
               _toggleShowEditIcon();
               _showDeleteIcon = false;
               // _selectMode = false;
@@ -1503,7 +1551,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 bottom: 20,
                 left: 20,
                 child: FloatingActionButton.extended(
-                  onPressed: _confirmDeleteRelays,
+                  onPressed: _confirmDeleteSchedules,
                   label: const Text('Delete'),
                   icon: const Icon(Icons.delete_sharp),
                   backgroundColor: Colors.blueAccent,
@@ -1668,6 +1716,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           if (_showDeleteIcon)
             Checkbox(
               value: isSelected, // Reflect current selection state
+              // activeColor: const Color.fromARGB(255, 245, 245,
+              //     245), // Set the color of the checkbox when selected
+              // checkColor: const Color.fromARGB(255, 252, 251,
+              //     251), // Set the color of the checkmark inside the checkbox
               onChanged: (bool? value) {
                 setState(() {
                   _isSelected[index] =
@@ -1765,68 +1817,3 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 }
-
-
-  // Widget _buildRelayList() {
-  //   var screenWidth = MediaQuery.of(context).size.width;
-
-  //   // Determine number of columns based on screen width
-  //   int crossAxisCount = screenWidth > 800 ? 2 : 1;
-
-  //   // Calculate childAspectRatio for different screen sizes (optional)
-  //   double childAspectRatio = screenWidth > 1350
-  //       ? 7.0
-  //       : screenWidth > 1150
-  //           ? 6.5
-  //           : screenWidth > 950
-  //               ? 5.5
-  //               : screenWidth > 800
-  //                   ? 4.5
-  //                   : 4.0;
-
-  //   return relays.isEmpty
-  //       ? Center(
-  //           child: Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               const Text(
-  //                 'No relays added yet.',
-  //                 style: TextStyle(fontSize: 18, color: Colors.grey),
-  //               ),
-  //               const SizedBox(height: 20),
-  //               ElevatedButton(
-  //                 onPressed: _addRelay,
-  //                 style: ElevatedButton.styleFrom(
-  //                   backgroundColor: Colors.blueAccent,
-  //                 ),
-  //                 child: const Text('Add Relay'),
-  //               ),
-  //             ],
-  //           ),
-  //         )
-  //       : CustomScrollView(
-  //           physics: const BouncingScrollPhysics(), // Bouncing scroll effect
-  //           slivers: [
-  //             SliverGrid(
-  //               delegate: SliverChildBuilderDelegate(
-  //                 (context, index) {
-  //                   return _buildRelayCard(index); // Build each relay card
-  //                 },
-  //                 childCount: relays.length,
-  //               ),
-  //               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-  //                 crossAxisCount:
-  //                     crossAxisCount, // Number of columns based on screen width
-  //                 crossAxisSpacing: 8.0, // Horizontal space between items
-  //                 mainAxisSpacing: 8.0, // Vertical space between items
-  //                 childAspectRatio:
-  //                     childAspectRatio, // Aspect ratio of each card
-  //               ),
-  //             ),
-  //             // Add extra padding at the bottom (same as before)
-  //             const SliverPadding(
-  //               padding: EdgeInsets.only(bottom: 200),
-  //             ),
-  //           ],
-  //         );
-  // }

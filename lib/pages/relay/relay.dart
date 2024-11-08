@@ -877,50 +877,6 @@ class _RelayScreenState extends State<RelayScreen> {
           );
   }
 
-  // Widget _buildRelayList() {
-  //   var screenWidth = MediaQuery.of(context).size.width;
-
-  //   // Determine number of columns based on screen width
-  //   int crossAxisCount = screenWidth > 800 ? 2 : 1;
-
-  //   // Calculate childAspectRatio for different screen sizes (optional)
-  //   double childAspectRatio = screenWidth > 1350
-  //       ? 7.0
-  //       : screenWidth > 1150
-  //           ? 6.5
-  //           : screenWidth > 950
-  //               ? 5.5
-  //               : screenWidth > 800
-  //                   ? 4.5
-  //                   : 4.0;
-
-  //   return CustomScrollView(
-  //     physics: const BouncingScrollPhysics(), // Bouncing scroll effect
-  //     slivers: [
-  //       SliverGrid(
-  //         delegate: SliverChildBuilderDelegate(
-  //           (context, index) {
-  //             return _buildRelayCard(index); // Build each schedule card
-  //           },
-  //           childCount: relays.length,
-  //         ),
-  //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-  //           crossAxisCount:
-  //               crossAxisCount, // Number of columns based on screen width
-  //           crossAxisSpacing: 8.0, // Horizontal space between items
-  //           mainAxisSpacing: 8.0, // Vertical space between items
-  //           childAspectRatio: childAspectRatio, // Aspect ratio of each card
-  //         ),
-  //       ),
-  //       // Add extra padding at the bottom (same as before)
-  //       const SliverPadding(
-  //         padding:
-  //             EdgeInsets.only(bottom: 200), // Adjust based on your card height
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget _buildRelayCard(int index) {
     bool isAlreadyAddedToHome = homeRelays.contains(relays[index]);
     Color backgroundColor = relays[index].isOn
