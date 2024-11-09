@@ -38,11 +38,12 @@ class _SignInState extends State<SignIn> {
           _errorMessage = null;
         });
 
+        // Fetch and store profile data
         var token = prefs.getString('accessToken');
         if (token != null) {
           try {
             await fetchProfileData(token);
-
+            // Navigate to the next screen or update the UI
             Navigator.pushReplacementNamed(context, '/home');
           } catch (error) {
             ScaffoldMessenger.of(context).showSnackBar(

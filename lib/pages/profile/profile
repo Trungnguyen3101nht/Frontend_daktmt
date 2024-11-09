@@ -62,6 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadProfile();
   }
 
+  // Generate new _loadProfile() method that will fetch the user's profile data from sharePreferences instead of call the fetchProfileData
   Future<void> _loadProfile() async {
     final prefs = await SharedPreferences.getInstance();
     try {
@@ -69,8 +70,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final storedProfileData = prefs.getString('profileData');
       if (storedProfileData != null) {
         final Map<String, dynamic> data = json.decode(storedProfileData);
-
-        print('Loaded Profile Data: $data');
 
         setState(() {
           _profileData = data;

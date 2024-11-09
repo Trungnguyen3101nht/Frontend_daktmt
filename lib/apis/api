@@ -215,7 +215,7 @@ Future<List<Map<String, dynamic>>> fetchlogtempdata(
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-
+      logger.i(data);
       return data.map((item) {
         DateTime date = DateTime.parse(item['date']);
         double xValue = (date.millisecondsSinceEpoch -
@@ -278,6 +278,7 @@ Future<List<Map<String, dynamic>>> fetchhistorydata(
   }
 }
 
+// Generate a new fetchProfileData to store profile data in sharePreferences and return it
 Future<void> fetchProfileData(String token) async {
   final baseUrl = dotenv.env['API_BASE_URL']!;
   final response = await http.get(
@@ -290,14 +291,9 @@ Future<void> fetchProfileData(String token) async {
 
   if (response.statusCode == 200) {
     final data = json.decode(response.body)['data'];
-    print('Fetched Data: $data'); // Debug fetched data
-
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
-        'profileData', json.encode(data)); // Store profile data
-
-    // Verify what is stored in SharedPreferences
-    print('Stored in SharedPreferences: ${prefs.getString('profileData')}');
+        'profileData', json.encode(data)); // Store profile data as JSON
   } else {
     throw Exception('Failed to fetch profile: ${response.body}');
   }
@@ -346,7 +342,7 @@ Future<Map<String, dynamic>> fetchEditProfile(
   final uri = Uri.parse('http://$baseUrl/profile/edit');
 
   try {
-    // Sử dụng MultipartRequest để upload file
+    // Sử dụng MultipartRequest để up file
     final request = http.MultipartRequest('PATCH', uri)
       ..headers['Authorization'] = 'Bearer $token';
 

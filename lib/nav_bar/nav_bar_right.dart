@@ -33,6 +33,7 @@ class Schedule {
   }
 }
 
+Map<String, dynamic>? profileData;
 // const bool _isHovered = false; // To detect hover
 const bool _isTapped = false; // To detect tap (for mobile)
 int? _hoveredIndex;
@@ -59,8 +60,6 @@ class nabarright_set extends StatefulWidget {
 }
 
 class _nabarright_setState extends State<nabarright_set> {
-  Map<String, dynamic>? profileData;
-
   @override
   void initState() {
     super.initState();
@@ -78,13 +77,27 @@ class _nabarright_setState extends State<nabarright_set> {
   }
 
   Future<void> _loadProfile() async {
-    try {
-      final data = await fetchProfileData(token!);
+    final prefs = await SharedPreferences.getInstance();
+    final storedProfileData = prefs.getString('profileData');
+
+    if (storedProfileData != null) {
+      final Map<String, dynamic> profileMap = json.decode(storedProfileData);
       setState(() {
-        profileData = data;
+        profileData = {
+          'username': profileMap['username'],
+          'email': profileMap['email'],
+        };
       });
-    } catch (error) {
-      logger.e("Error fetching profile: $error");
+      print("Loaded profileData from SharedPreferences: $profileData");
+    } else {
+      // If no profile data is found in SharedPreferences
+      setState(() {
+        profileData = {
+          'username': 'Guest',
+          'email': 'No email available',
+        };
+      });
+      print("No profileData found in SharedPreferences.");
     }
   }
 
@@ -159,27 +172,20 @@ class _nabarright_setState extends State<nabarright_set> {
             child: Row(
               children: [
                 ClipOval(
-                  child: profileData != null &&
-                          profileData!['avatar'] != null &&
-                          profileData!['avatar']['data'] != null
-                      ? Image.memory(
-                          base64Decode(profileData!['avatar']['data']),
-                          width: 35,
-                          height: 35,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
+                  child: profileData != null
+                      ? Image.asset(
                           'assets/hcmut.png',
                           width: 35,
                           height: 35,
                           fit: BoxFit.cover,
-                        ),
+                        )
+                      : const Icon(Icons.account_circle, size: 35),
                 ),
                 SizedBox(width: isRowLayout ? 8 : 0),
                 isRowLayout
-                    ? const Text(
-                        "NguyenTrung",
-                        style: TextStyle(
+                    ? Text(
+                        profileData?['username'] ?? 'Guest',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -196,9 +202,14 @@ class _nabarright_setState extends State<nabarright_set> {
 }
 
 class Navbar_right extends StatelessWidget {
-  final Map<String, dynamic> profileData;
+  const Navbar_right({super.key});
 
-  const Navbar_right({super.key, required this.profileData});
+  // final Map<String, dynamic>? profileData;
+
+  // const Navbar_right({
+  //   super.key,
+  //   required this.profileData,
+  // });
 
   @override
   Widget build(BuildContext context) {
@@ -207,18 +218,32 @@ class Navbar_right extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: const Text('NguyenTrung'),
-            accountEmail: const Text('trungvodich@gmail.com'),
-            currentAccountPicture: CircleAvatar(
-              child: ClipOval(
-                child: profileData['avatar'] != null &&
-                        profileData['avatar']['data'] != null
-                    ? Image.memory(
-                        base64Decode(profileData['avatar']['data']),
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset('assets/hcmut.png'),
+            accountName: Text(
+              profileData?['username'] ?? 'Unknown User', // Display username
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
+            ),
+            accountEmail: Text(
+              profileData?['email'] ?? 'Email not available', // Display email
+              style: const TextStyle(fontSize: 14),
+            ),
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: profileData != null
+                  ? const ClipOval(
+                      child: Icon(
+                        Icons.account_circle,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    )
+                  : const Icon(
+                      Icons.account_circle,
+                      size: 80,
+                      color: Colors.grey,
+                    ),
             ),
             decoration: const BoxDecoration(
               color: Color.fromARGB(255, 165, 165, 165),
@@ -238,8 +263,7 @@ class Navbar_right extends StatelessWidget {
           ),
           LayoutBuilder(
             builder: (context, constraints) {
-              final cardWidth = constraints.maxWidth *
-                  0.9; // Adjusts card size to 90% of the drawer width
+              final cardWidth = constraints.maxWidth * 0.9;
 
               return ListView.builder(
                 shrinkWrap: true,

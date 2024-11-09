@@ -130,46 +130,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  // Future<void> fetchSchedulesAPI() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   var token = prefs.getString('accessToken')!;
-  //   final baseUrl = dotenv.env['API_BASE_URL']!;
-  //   final url = Uri.parse('http://$baseUrl/schedule/get');
-  //   try {
-  //     final response = await http.get(url, headers: {
-  //       'Authorization': 'Bearer $token',
-  //     });
-
-  //     if (response.statusCode == 200) {
-  //       final responseData = json.decode(response.body);
-
-  //       if (responseData is List) {
-  //         List<Schedule> fetchedSchedules = responseData
-  //             .map<Schedule>((scheduleJson) => Schedule.fromJson(scheduleJson))
-  //             .toList();
-
-  //         await prefs.setString('schedules', json.encode(responseData));
-
-  //         setState(() {
-  //           schedules = fetchedSchedules;
-  //           _isSelected = List.generate(schedules.length, (_) => false);
-  //         });
-  //         print("Success to fetch schedules");
-  //       } else {
-  //         setState(() {
-  //           relays = [];
-  //           _isSelected = [];
-  //         });
-  //         print("Unexpected response format: ${response.body}");
-  //       }
-  //     } else {
-  //       print("Failed to fetch relays: ${response.body}");
-  //     }
-  //   } catch (e) {
-  //     print("Error occurred: $e");
-  //   }
-  // }
-
   Future<void> fetchSchedulesAPI() async {
     final prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('accessToken')!;
@@ -212,7 +172,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       print("Error occurred: $e");
     }
   }
-
+  
   Future<void> loadSchedulesFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     String? schedulesJson = prefs.getString('schedules');

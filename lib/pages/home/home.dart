@@ -85,8 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       drawer: const Navbar_left(),
       endDrawer: const Navbar_right(
-        profileData: {},
-      ),
+          // profileData: {},
+          ),
       body: SingleChildScrollView(
         child: Stack(
           children: [
