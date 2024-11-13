@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class Relay {
   final int id;
@@ -46,47 +44,18 @@ class _ToggleState extends State<toggle> {
   }
 
   Future<void> fetchHomeRelays() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('accessToken') ?? '';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final responseData = prefs.getString('relays_home');
+    if (responseData != null) {
+      final decodedData = json.decode(responseData);
 
-    // Check if environment variable is loaded properly
-    final baseUrl = dotenv.env['API_BASE_URL'];
-    print(homeRelays);
-    if (baseUrl == null) {
-      print("Error: API_BASE_URL is not set in .env");
-      return;
-    }
-
-    final url = Uri.parse('http://$baseUrl/relay/get-home');
-
-    try {
-      var response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-
-        if (responseData is List) {
-          setState(() {
-            homeRelays = responseData
-                .map<Relay>((relayJson) => Relay.fromJson(relayJson))
-                .toList();
-          });
-          print(homeRelays);
-          print("Successfully fetched home relays.");
-        } else {
-          print("Unexpected response format: ${response.body}");
-        }
-      } else {
-        print("Failed to fetch home relays: ${response.body}");
+      if (decodedData is List) {
+        setState(() {
+          homeRelays = decodedData
+              .map<Relay>((relayJson) => Relay.fromJson(relayJson))
+              .toList();
+        });
       }
-    } catch (e) {
-      print("Error occurred: $e");
     }
   }
 

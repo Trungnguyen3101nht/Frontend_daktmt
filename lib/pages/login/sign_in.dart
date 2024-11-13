@@ -41,8 +41,6 @@ class _SignInState extends State<SignIn> {
         var token = prefs.getString('accessToken');
         if (token != null) {
           try {
-            await fetchProfileData(token);
-
             Navigator.pushReplacementNamed(context, '/home');
           } catch (error) {
             ScaffoldMessenger.of(context).showSnackBar(

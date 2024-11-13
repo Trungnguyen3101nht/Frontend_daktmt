@@ -38,17 +38,6 @@ Map<String, dynamic>? profileData;
 const bool _isTapped = false; // To detect tap (for mobile)
 int? _hoveredIndex;
 
-final currentDay = DateTime.now().weekday;
-final daysOfWeek = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday'
-];
-final today = daysOfWeek[currentDay - 1];
 // List<Schedule> schedules = [];
 List<Schedule> todaySchedules = [];
 
@@ -63,17 +52,8 @@ class _nabarright_setState extends State<nabarright_set> {
   @override
   void initState() {
     super.initState();
-    _getToken();
     _loadProfile();
-    // filterTodaySchedules();
-    fetchSchedulesAPI(today);
-  }
-
-  String? token;
-
-  void _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    token = prefs.getString('accessToken');
+    fetchSchedulesAPI();
   }
 
   Future<void> _loadProfile() async {
@@ -90,7 +70,6 @@ class _nabarright_setState extends State<nabarright_set> {
       });
       print("Loaded profileData from SharedPreferences: $profileData");
     } else {
-      // If no profile data is found in SharedPreferences
       setState(() {
         profileData = {
           'username': 'Guest',
@@ -101,46 +80,21 @@ class _nabarright_setState extends State<nabarright_set> {
     }
   }
 
-  Future<void> fetchSchedulesAPI(String day) async {
-    final prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('accessToken')!;
-    final baseUrl = dotenv.env['API_BASE_URL']!;
-    final url = Uri.parse('http://$baseUrl/schedule/get-home');
-
-    Map<String, dynamic> requestBody = {
-      "day": day,
-    };
-
-    try {
-      var response = await http.patch(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
-        },
-        body: jsonEncode(requestBody),
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-
-        if (responseData is List) {
-          List<Schedule> fetchedSchedules = responseData
-              .map<Schedule>((scheduleJson) => Schedule.fromJson(scheduleJson))
-              .toList();
-
-          setState(() {
-            todaySchedules = fetchedSchedules;
-          });
-          print("Success to fetch schedules");
-        } else {
-          print("Unexpected response format: ${response.body}");
-        }
-      } else {
-        print("Failed to fetch schedules: ${response.body}");
+  Future<void> fetchSchedulesAPI() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final responseData = prefs.getString('schedules_home');
+    if (responseData != null) {
+      try {
+        final List<dynamic> jsonSchedules = json.decode(responseData);
+        List<Schedule> fetchedSchedules = jsonSchedules
+            .map<Schedule>((scheduleJson) => Schedule.fromJson(scheduleJson))
+            .toList();
+        setState(() {
+          todaySchedules = fetchedSchedules;
+        });
+      } catch (e) {
+        print("Error parsing local schedules: $e");
       }
-    } catch (e) {
-      print("Error occurred: $e");
     }
   }
 

@@ -27,8 +27,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   double humidity = 0.0;
   double temperature = 0.0;
-  double latitude = 0.0;
-  double longitude = 0.0;
+  double latitude = 10.7736288;
+  double longitude = 106.6602627;
   String token = "";
 
   List<FlSpot> humiditySpots = [];
@@ -41,32 +41,29 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchSensorData();
   }
 
-// Function to fetch sensor dat
   Future<void> fetchSensorData() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       token = prefs.getString('accessToken')!;
 
-      double humidityData = 0.00;
-      double temperatureData = 0.00;
-      double fetchedLatitude = latitude;
-      double fetchedLongitude = longitude;
+      double humidityData = prefs.getDouble('humidity') ?? 0.0;
+      double temperatureData = prefs.getDouble('temperature') ?? 0.0;
+      String locationData =
+          prefs.getString('location') ?? "10.7736288-106.6602627";
+
+      double fetchedLatitude = 10.7736288;
+      double fetchedLongitude = 106.6602627;
+
       if (token.isEmpty) {
         logger.e('Non Access Token.');
       } else {
-        humidityData = await fetchHumidityData(token);
-        temperatureData = await fetchTemperatureData(token);
         LatLng locationA = await fetchLocationData(token);
-
-        fetchedLatitude = locationA.latitude;
-        fetchedLongitude = locationA.longitude;
       }
 
-      // Cập nhật trạng thái
       setState(() {
-        humidity = humidityData; // Sử dụng '0' nếu không có giá trị
+        humidity = humidityData;
         temperature = temperatureData;
-        latitude = fetchedLatitude; // Update latitude with fetched value
+        latitude = fetchedLatitude;
         longitude = fetchedLongitude;
       });
     } catch (error) {
